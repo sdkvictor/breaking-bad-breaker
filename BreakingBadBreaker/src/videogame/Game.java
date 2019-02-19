@@ -57,6 +57,8 @@ public class Game implements Runnable {
     private KeyManager keyManager;
     private MouseManager mouseManager;
     
+    private Player player;
+    
     /**
     * to create title, width and height and set the game is still not running
     * @param title to set the title of the window
@@ -81,6 +83,8 @@ public class Game implements Runnable {
         display = new Display(title, width, height);
         Assets.init();
         
+        player = new Player(100, 100, 100, 100, this);
+        
         display.getJframe().addKeyListener(keyManager);
         display.getJframe().addMouseListener(mouseManager);
         display.getJframe().addMouseMotionListener(mouseManager);
@@ -94,14 +98,15 @@ public class Game implements Runnable {
      * updates all objects on a frame
      */
     private void tick() {
-       
+       keyManager.tick();
+       player.tick();
     }
     
     /**
      * renders all objects in a frame
      */
     private void render() {
-        Toolkit.getDefaultToolkit().sync(); //Linux
+        //Toolkit.getDefaultToolkit().sync(); //Linux
         bs = display.getCanvas().getBufferStrategy();
         
         if (bs == null) {
@@ -111,7 +116,7 @@ public class Game implements Runnable {
             g = bs.getDrawGraphics();
             g.clearRect(0, 0, width, height);
             g.drawImage(Assets.background, 0, 0, width, height, null);
-            
+            player.render(g);
             bs.show();
             g.dispose();
             

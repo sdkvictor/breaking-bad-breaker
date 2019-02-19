@@ -13,15 +13,13 @@ import java.awt.Graphics;
  */
 public class Player extends Item {
     
-    private int direction;
     private int width;
     private int height;
     private Game game;
     private int speed;
 
-    public Player(int x, int y, int direction, int width, int height, Game game) {
+    public Player(int x, int y, int width, int height, Game game) {
         super(x, y);
-        this.direction = direction;
         this.width = width;
         this.height = height;
         this.game = game;
@@ -31,19 +29,6 @@ public class Player extends Item {
     @Override
     public void tick() {
         
-        if (game.getMouseManager().isIzquierdo()) {
-            setX(game.getMouseManager().getX());
-            setY(game.getMouseManager().getY());
-        }
-        
-        if (game.getKeyManager().up) {
-            setY(getY() - speed);
-        }
-        
-        if (game.getKeyManager().down) {
-            setY(getY() + speed);
-        }
-        
         if (game.getKeyManager().left) {
             setX(getX() - speed);
         }
@@ -51,29 +36,11 @@ public class Player extends Item {
         if (game.getKeyManager().right) {
             setX(getX() + speed);
         }
-        
-        if (getX() + 60 >= game.getWidth()) {
-            setX(game.getWidth() - 60);
-        }
-        else if (getX() <= -30) {
-            setX(-30);
-        }
-        
-        if (getY() + 80 >= game.getHeight()) {
-            setY(game.getHeight() - 80);
-        }
-        else if (getY() <= -20) {
-            setY(-20);
-        }
     }
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(Assets.player, getX(), getY(), getWidth(), getHeight(), null);
-    }
-
-    public int getDirection() {
-        return direction;
+        g.fillRect(getX(), getY(), getWidth(), getHeight());
     }
 
     public int getWidth() {
@@ -82,10 +49,6 @@ public class Player extends Item {
 
     public int getHeight() {
         return height;
-    }
-
-    public void setDirection(int direction) {
-        this.direction = direction;
     }
 
     public void setHeight(int height) {

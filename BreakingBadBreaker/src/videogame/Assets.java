@@ -17,7 +17,7 @@ public class Assets {
     public static BufferedImage player;
     
     public static void init() {
-        background = ImageLoader.loadImage("/images/background_mario.jpg");
-        player = ImageLoader.loadImage("/images/mario.png");
+        background = ImageLoader.loadImage("/images/background.jpg");
+        //player = ImageLoader.loadImage("/images/mario.png");
     }
 }
