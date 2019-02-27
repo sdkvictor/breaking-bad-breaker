@@ -75,9 +75,7 @@ public class Game implements Runnable {
         this.width = width;
         this.height = height;
         bricks = new LinkedList<Brick>();
-
         running = false;
-
         keyManager = new KeyManager();
         mouseManager = new MouseManager();
     }
@@ -98,7 +96,8 @@ public class Game implements Runnable {
                 brickNum = 0;
                 row++;
             }
-            bricks.add(new Brick(100+brickNum*100, 100+row*20, 100, 20, this));
+            bricks.add(new Brick(100+brickNum*102, 100+row*22, 100, 20, this));
+            brickNum++;
         }
 
         display.getJframe().addKeyListener(keyManager);
