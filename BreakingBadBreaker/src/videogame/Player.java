@@ -34,6 +34,14 @@ public class Player extends Item {
         if (game.getKeyManager().right) {
             setX(getX() + speed);
         }
+        
+        if (getX() + getWidth() > game.getWidth()) {
+            setX(game.getWidth() - getWidth());
+        }
+        
+        if (getX() < 0) {
+            setX(0);
+        }
     }
 
     @Override

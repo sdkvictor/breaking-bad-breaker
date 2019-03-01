@@ -87,7 +87,7 @@ public class Game implements Runnable {
         display = new Display(title, width, height);
         Assets.init();
 
-        player = new Player(100, 650, 150, 30, this);
+        player = new Player(getWidth() / 2, 650, 150, 30, this);
         ball = new Ball(getWidth() / 2 - 25, getHeight() / 2 - 25, 50, 50, this);
         int brickNum = 0;
         int row = 0;
@@ -120,12 +120,18 @@ public class Game implements Runnable {
        if (ball.intersects(player)) {
 
             int totalLength = ball.getWidth() + player.getWidth();
-
-            if (ball.getY() + ball.getWidth() < player.getY()) {
-               //int ballPlayerDiff = ball.getX() - player.getX() + ball.getWidth() - ;
-
-               //if ()
-            }
+            
+            //Check if ball hits from up
+            //if (ball.getY() + ball.getHeight() <= player.getY()) {
+                float dist = ball.getX() + ball.getWidth() / 2 - (player.getX() + player.getWidth() / 2);
+                System.out.println("PLayer x + width / 2: " + Integer.toString(player.getX() + player.getWidth() / 2));
+                System.out.println("Ball x:" + Integer.toString(ball.getX()));
+                System.out.println("DIST:" + Float.toString(dist));
+                int deltaVel = (int) ((dist / 150.0) * ball.getMaxVel());
+                ball.setxVel(ball.getxVel() + deltaVel);
+            //}
+            
+            ball.setyVel(ball.getyVel() * -1);
         }
 
        //brick.tick();
