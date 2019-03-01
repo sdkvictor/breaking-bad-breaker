@@ -62,6 +62,8 @@ public class Game implements Runnable {
     private LinkedList<Brick> bricks;
 
     private Ball ball;
+    
+    private boolean pause;
 
     /**
      * to create title, width and height and set the game is still not running
@@ -78,6 +80,7 @@ public class Game implements Runnable {
         running = false;
         keyManager = new KeyManager();
         mouseManager = new MouseManager();
+        pause = false;
     }
 
     /**
@@ -113,28 +116,38 @@ public class Game implements Runnable {
      * updates all objects on a frame
      */
     private void tick() {
-       keyManager.tick();
-       player.tick();
-       ball.tick();
+        if (pause) {
+            return;
+        }
+        
+        keyManager.tick();
+        player.tick();
+        ball.tick();
 
-       if (ball.intersects(player)) {
+        if (ball.intersects(player)) {
 
             int totalLength = ball.getWidth() + player.getWidth();
             
             //Check if ball hits from up
-            //if (ball.getY() + ball.getHeight() <= player.getY()) {
+            if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
+                
+                //Calculate the distance the ball is from the center of the player pad
                 float dist = ball.getX() + ball.getWidth() / 2 - (player.getX() + player.getWidth() / 2);
-                System.out.println("PLayer x + width / 2: " + Integer.toString(player.getX() + player.getWidth() / 2));
-                System.out.println("Ball x:" + Integer.toString(ball.getX()));
-                System.out.println("DIST:" + Float.toString(dist));
+                
+                //Map the dist value in proportion to the maxVel of the ball
                 int deltaVel = (int) ((dist / 150.0) * ball.getMaxVel());
+                
+                //Update ball's xVel accordingly
                 ball.setxVel(ball.getxVel() + deltaVel);
-            //}
+            }
             
+            //Bounce the velocity in the y component
             ball.setyVel(ball.getyVel() * -1);
         }
-
-       //brick.tick();
+        
+        if (keyManager.p) {
+            pause = !pause;
+        }
     }
 
     /**

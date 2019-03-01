@@ -21,7 +21,7 @@ public class Player extends Item {
     public Player(int x, int y, int width, int height, Game game) {
         super(x, y, width, height);
         this.game = game;
-        this.speed = 5;
+        this.speed = 10;
     }
 
     @Override
