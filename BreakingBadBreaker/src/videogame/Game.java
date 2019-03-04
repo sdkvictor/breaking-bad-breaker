@@ -62,6 +62,12 @@ public class Game implements Runnable {
     private LinkedList<Brick> bricks;
 
     private Ball ball;
+    
+    private boolean pause;
+    private boolean gameOver;
+    
+    private boolean brickBroke;
+    private int numBrokenBricks;
 
     /**
      * to create title, width and height and set the game is still not running
@@ -78,6 +84,7 @@ public class Game implements Runnable {
         running = false;
         keyManager = new KeyManager();
         mouseManager = new MouseManager();
+        pause = false;
     }
 
     /**
@@ -87,18 +94,20 @@ public class Game implements Runnable {
         display = new Display(title, width, height);
         Assets.init();
 
-        player = new Player(100, 650, 150, 30, this);
+        player = new Player(getWidth() / 2, 650, 150, 30, this);
         ball = new Ball(getWidth() / 2 - 25, getHeight() / 2 - 25, 50, 50, this);
         int brickNum = 0;
         int row = 0;
-        for (int i = 0; i < 20; i++) {
-            if(brickNum>=4){
+        for (int i = 0; i < 30; i++) {
+            if(brickNum>=6){
                 brickNum = 0;
                 row++;
             }
-            bricks.add(new Brick(100+brickNum*102, 100+row*22, 100, 20, this));
+            bricks.add(new Brick(100+brickNum*154, 100+row*33, 150, 30, this));
             brickNum++;
         }
+        brickBroke = false;
+        numBrokenBricks = 0;
 
         display.getJframe().addKeyListener(keyManager);
         display.getJframe().addMouseListener(mouseManager);
@@ -113,22 +122,50 @@ public class Game implements Runnable {
      * updates all objects on a frame
      */
     private void tick() {
-       keyManager.tick();
-       player.tick();
-       ball.tick();
+        if (pause) {
+            return;
+        }
+        
+        keyManager.tick();
+        player.tick();
+        ball.tick();
 
-       if (ball.intersects(player)) {
+        if (ball.intersects(player)) {
 
             int totalLength = ball.getWidth() + player.getWidth();
-
-            if (ball.getY() + ball.getWidth() < player.getY()) {
-               //int ballPlayerDiff = ball.getX() - player.getX() + ball.getWidth() - ;
-
-               //if ()
+            
+            //Check if ball hits from up
+            if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
+                
+                //Calculate the distance the ball is from the center of the player pad
+                float dist = ball.getX() + ball.getWidth() / 2 - (player.getX() + player.getWidth() / 2);
+                
+                //Map the dist value in proportion to the maxVel of the ball
+                int deltaVel = (int) ((dist / 150.0) * ball.getMaxVel());
+                
+                //Update ball's xVel accordingly
+                ball.setxVel(ball.getxVel() + deltaVel);
+            }
+            
+            //Bounce the velocity in the y component
+            ball.setyVel(ball.getyVel() * -1);
+        }
+        
+        for(int i=0; i<bricks.size(); i++){
+            Brick myBrick = bricks.get(i);
+            if(ball.intersects(myBrick)&&!brickBroke&&!myBrick.isBroken()){
+                bricks.get(i).setBroken(true);
+                numBrokenBricks++;
+                brickBroke = true;
+                bricks.get(i).setBroken(true);
+                ball.setyVel(ball.getyVel() * -1);               
             }
         }
-
-       //brick.tick();
+        brickBroke = false;
+        
+        if (keyManager.p) {
+            pause = !pause;
+        }
     }
 
     /**

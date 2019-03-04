@@ -15,20 +15,32 @@ import java.awt.Graphics;
 public class Brick extends Item {
     
     private Game game;
+    private boolean broken;
     
     public Brick(int x, int y, int width, int height, Game game) {
         super(x, y, width, height);
         this.game = game;
+        broken = false;
     }
-
+    
+    public boolean isBroken(){
+        return broken;
+    }
+    
+    public void setBroken(boolean broken){
+        this.broken = broken;
+    }
+    
     @Override
     public void tick() {
     }
-
+    
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.pink);
-        g.fillRect(x, y, width, height);
+        if(!broken){
+            g.setColor(Color.pink);
+            g.fillRect(x, y, width, height);
+        }
     }
     
 }

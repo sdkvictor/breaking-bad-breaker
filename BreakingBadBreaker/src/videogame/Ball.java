@@ -24,16 +24,36 @@ public class Ball extends Item {
         super(x, y, width, height);
         this.game = game;
         
-        maxVel = 10;
+        maxVel = 20;
         
         xVel = 0;
-        yVel = maxVel;
+        yVel = 5;
     }
 
     @Override
     public void tick() {
         setX(getX() + xVel);
         setY(getY() + yVel);
+        
+        if (getY() <= 0) {
+            setyVel(getyVel() * -1);
+        }
+        
+        if (getX() <= 0) {
+            setxVel(getxVel() * -1);
+        }
+        
+        if (getX() + getWidth() >= game.getWidth()) {
+            setxVel(getxVel() * -1);
+        }
+        
+        if (getxVel() > getMaxVel()) {
+            setxVel(getMaxVel());
+        }
+        
+        if (getyVel() > getMaxVel()) {
+            setyVel(getMaxVel());
+        }
     }
 
     @Override
@@ -57,4 +77,9 @@ public class Ball extends Item {
     public void setyVel(int yVel) {
         this.yVel = yVel;
     }
+
+    public int getMaxVel() {
+        return maxVel;
+    }
+    
 }
