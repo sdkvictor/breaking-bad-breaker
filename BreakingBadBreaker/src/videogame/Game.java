@@ -64,6 +64,10 @@ public class Game implements Runnable {
     private Ball ball;
     
     private boolean pause;
+    private boolean gameOver;
+    
+    private boolean brickBroke;
+    private int numBrokenBricks;
 
     /**
      * to create title, width and height and set the game is still not running
@@ -94,14 +98,16 @@ public class Game implements Runnable {
         ball = new Ball(getWidth() / 2 - 25, getHeight() / 2 - 25, 50, 50, this);
         int brickNum = 0;
         int row = 0;
-        for (int i = 0; i < 20; i++) {
-            if(brickNum>=4){
+        for (int i = 0; i < 30; i++) {
+            if(brickNum>=6){
                 brickNum = 0;
                 row++;
             }
-            bricks.add(new Brick(100+brickNum*102, 100+row*22, 100, 20, this));
+            bricks.add(new Brick(100+brickNum*154, 100+row*33, 150, 30, this));
             brickNum++;
         }
+        brickBroke = false;
+        numBrokenBricks = 0;
 
         display.getJframe().addKeyListener(keyManager);
         display.getJframe().addMouseListener(mouseManager);
@@ -144,6 +150,18 @@ public class Game implements Runnable {
             //Bounce the velocity in the y component
             ball.setyVel(ball.getyVel() * -1);
         }
+        
+        for(int i=0; i<bricks.size(); i++){
+            Brick myBrick = bricks.get(i);
+            if(ball.intersects(myBrick)&&!brickBroke&&!myBrick.isBroken()){
+                bricks.get(i).setBroken(true);
+                numBrokenBricks++;
+                brickBroke = true;
+                bricks.get(i).setBroken(true);
+                ball.setyVel(ball.getyVel() * -1);               
+            }
+        }
+        brickBroke = false;
         
         if (keyManager.p) {
             pause = !pause;
