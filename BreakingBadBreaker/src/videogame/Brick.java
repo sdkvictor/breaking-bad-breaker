@@ -17,6 +17,8 @@ public class Brick extends Item {
     private Game game;
     private boolean broken;
     
+    private int lives;
+    
     private Animation expAni;
     
     private boolean recentBroken;
@@ -28,6 +30,8 @@ public class Brick extends Item {
         
         expAni = new Animation(Assets.animationExplosion, 60);
         recentBroken = false;
+        
+        lives = 2;
     }
     
     public boolean isBroken(){
@@ -52,7 +56,11 @@ public class Brick extends Item {
     @Override
     public void render(Graphics g) {
         if(!broken){
-            g.drawImage(Assets.brick, getX(), getY(), getWidth(), getHeight(), null);
+            if (lives == 1) {
+                g.drawImage(Assets.brickHalf, getX(), getY(), getWidth(), getHeight(), null);
+            } else {
+                g.drawImage(Assets.brick, getX(), getY(), getWidth(), getHeight(), null);
+            }
         } else if (recentBroken) {
             g.drawImage(expAni.getCurrentFrame(), getX()-15, getY()-35, null);
         }
@@ -64,5 +72,13 @@ public class Brick extends Item {
 
     public boolean isRecentBroken() {
         return recentBroken;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
     }
 }

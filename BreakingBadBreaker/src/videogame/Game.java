@@ -218,9 +218,20 @@ public class Game implements Runnable {
             
             //Check if the ball collides with a brick
             if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
-                score += 100*combo;
+                
+                myBrick.setLives(myBrick.getLives()-1);
+                
+                if (myBrick.getLives() == 0) {
+                    //Indicate that the brick has recently been broken
+                    myBrick.setRecentBroken(true);
+                    //Set it to permanently broken
+                    myBrick.setBroken(true);
+                    score += 200*combo;
+                } else {
+                    score += 50*combo;
+                }
+                    
                 combo++;
-                bricks.get(i).setBroken(true);
                 
                 //Decide if create a powerup, chance is 1/2
                 boolean createPower = ((int) (Math.random() * 2)) == 0;
@@ -230,16 +241,9 @@ public class Game implements Runnable {
                     int power = (int) (Math.random() * 2);
                     powerups.add(new PowerUp(myBrick.getX(), myBrick.getY(), 60, 20, power));
                 }
-                //Increase score
-                score += 100;
                 
-                myBrick.setBroken(true);
-
                 numBrokenBricks++;
                 brickBroke = true;
-
-                //Indicate that the brick has recently been broken
-                myBrick.setRecentBroken(true);
                 
                 //Padding is the error tolerance of the collision of the ball with the left and right side of the bricks
                 int padding = 5;
@@ -369,6 +373,7 @@ public class Game implements Runnable {
         combo = 1;
         for (int i = 0; i < bricks.size(); i++) {
             Brick myBrick = bricks.get(i);
+            myBrick.setLives(2);
             myBrick.setBroken(false);
             myBrick.setRecentBroken(false);
         }
