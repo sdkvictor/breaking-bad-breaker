@@ -110,15 +110,15 @@ public class Game implements Runnable {
 
         player = new Player(getWidth() / 2, 650, 150, 30, this);
         ball = new Ball(getWidth() / 2 - 25, getHeight() / 2 - 25, 50, 50, this);
-        //ball = new Ball(0, 200, 50, 50, this);
+        
         int brickNum = 0;
         int row = 0;
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 24; i++) {
             if(brickNum >= 6){
                 brickNum = 0;
                 row++;
             }
-            bricks.add(new Brick(100+brickNum*154, 100+row*33, 150, 30, this));
+            bricks.add(new Brick(100+brickNum*173, 100+row*75, 100, 50, this));
             brickNum++;
         }
         brickBroke = false;
@@ -158,8 +158,6 @@ public class Game implements Runnable {
             return;
         }
         
-        
-        
         keyManager.tick();
         player.tick();
         ball.tick();
@@ -191,12 +189,16 @@ public class Game implements Runnable {
         
         for(int i=0; i<bricks.size(); i++){
             Brick myBrick = bricks.get(i);
+            myBrick.tick();
             if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
                 score += 100;
                 bricks.get(i).setBroken(true);
                 numBrokenBricks++;
                 brickBroke = true;
                 bricks.get(i).setBroken(true);
+                
+                bricks.get(i).setRecentBroken(true);
+                
                 boolean brickBetween = false;
                 boolean upBetween = false;
                 boolean downBetween = false;
@@ -261,7 +263,7 @@ public class Game implements Runnable {
             g.drawString("Score: " + Integer.toString(score), 40, 50);
             
             for (int i = 0; i < player.getLives(); i++) {
-                g.drawImage(Assets.life, 15 + 40*i, getHeight() - 40, 40, 40, null);
+                g.drawImage(Assets.life, 250 + 40*i, 20, 40, 40, null);
             }
             
             if (gameOver) {
@@ -291,6 +293,7 @@ public class Game implements Runnable {
         for (int i = 0; i < bricks.size(); i++) {
             Brick myBrick = bricks.get(i);
             myBrick.setBroken(false);
+            myBrick.setRecentBroken(false);
         }
         
         player.setLives(3);
@@ -302,6 +305,7 @@ public class Game implements Runnable {
      */
     void resetPositions() {
         starting = true;
+        ball.setxVel(0);
         player.setX(getWidth() / 2 - player.getWidth() / 2);
     }
     
