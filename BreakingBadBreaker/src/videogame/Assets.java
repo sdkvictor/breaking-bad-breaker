@@ -16,6 +16,7 @@ public class Assets {
     public static BufferedImage background;
     public static BufferedImage player;
     public static BufferedImage brick;
+    public static BufferedImage brickHalf;
     public static BufferedImage life;
     public static BufferedImage fastPower;
     public static BufferedImage bigPower;
@@ -29,7 +30,8 @@ public class Assets {
     public static void init() {
         background = ImageLoader.loadImage("/images/back_break.jpg");
         life = ImageLoader.loadImage("/images/heart.png");
-        brick = ImageLoader.loadImage("/images/nuclear_barrel_new.jpg");
+        brick = ImageLoader.loadImage("/images/brick.png");
+        brickHalf = ImageLoader.loadImage("/images/brick_half.png");
         ballSprites = ImageLoader.loadImage("/images/ball_sprite.png");
         explosionSprites = ImageLoader.loadImage("/images/explosion_sprite.png");
         fastPower = ImageLoader.loadImage("/images/fastpower.png");
