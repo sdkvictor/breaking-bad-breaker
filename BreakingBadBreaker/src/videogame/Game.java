@@ -83,6 +83,7 @@ public class Game implements Runnable {
     private boolean starting;
     
     private int score;
+    private int combo;
 
     /**
      * to create title, width and heigh t and set the game is still not running
@@ -103,6 +104,7 @@ public class Game implements Runnable {
         pause = false;
         starting = true;
         score = 0;
+        combo = 1;
         gameDone = false;
     }
 
@@ -183,6 +185,7 @@ public class Game implements Runnable {
         }
 
         if (ball.intersects(player) && !starting) {
+            combo = 1;
             
             //Check if ball hits from up
             if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
@@ -215,6 +218,9 @@ public class Game implements Runnable {
             
             //Check if the ball collides with a brick
             if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
+                score += 100*combo;
+                combo++;
+                bricks.get(i).setBroken(true);
                 
                 //Decide if create a powerup, chance is 1/2
                 boolean createPower = ((int) (Math.random() * 2)) == 0;
@@ -228,6 +234,7 @@ public class Game implements Runnable {
                 score += 100;
                 
                 myBrick.setBroken(true);
+
                 numBrokenBricks++;
                 brickBroke = true;
 
@@ -321,6 +328,10 @@ public class Game implements Runnable {
             g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
             g.setColor(Color.white);
             g.drawString("Score: " + Integer.toString(score), 40, 50);
+            if(combo>1){
+                g.drawString("Combo: x" + Integer.toString(combo), 40, 80);
+
+            }
             
             for (int i = 0; i < player.getLives(); i++) {
                 g.drawImage(Assets.life, 250 + 40*i, 20, 40, 40, null);
@@ -355,7 +366,7 @@ public class Game implements Runnable {
      */
     void resetGame() {
         score = 0;
-        
+        combo = 1;
         for (int i = 0; i < bricks.size(); i++) {
             Brick myBrick = bricks.get(i);
             myBrick.setBroken(false);
@@ -369,8 +380,9 @@ public class Game implements Runnable {
     /**
      * Reset movable objects to initial positions
      */
-    void resetPositions() {
+    void resetPositions() { 
         starting = true;
+        combo = 1;
         ball.setxVel(0);
         player.setX(getWidth() / 2 - player.getWidth() / 2);
     }
