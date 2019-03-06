@@ -19,6 +19,8 @@ public class Ball extends Item {
     private int yVel;
     
     private int maxVel;
+    
+    private Animation ballAni;
 
     public Ball(int x, int y, int width, int height, Game game) {
         super(x, y, width, height);
@@ -28,10 +30,18 @@ public class Ball extends Item {
         
         xVel = 0;
         yVel = 5;
+        
+        ballAni = new Animation(Assets.animationBall, 100);
     }
 
     @Override
     public void tick() {
+        
+        if (game.getStarting()) {
+            setX(game.getPlayer().getX() + game.getPlayer().getWidth() / 2 - getWidth() / 2);
+            setY(game.getPlayer().getY() -  getHeight());
+        }
+        
         setX(getX() + xVel);
         setY(getY() + yVel);
         
@@ -40,11 +50,11 @@ public class Ball extends Item {
         }
         
         if (getX() <= 0) {
-            setxVel(getxVel() * -1);
+            setxVel(Math.abs(getxVel()));
         }
         
         if (getX() + getWidth() >= game.getWidth()) {
-            setxVel(getxVel() * -1);
+            setxVel(Math.abs(getxVel()) * -1);
         }
         
         if (getxVel() > getMaxVel()) {
@@ -54,12 +64,23 @@ public class Ball extends Item {
         if (getyVel() > getMaxVel()) {
             setyVel(getMaxVel());
         }
+        
+        if (getY() <= 0) {
+            setY(0);
+        }
+        
+        if (getY() + getHeight() >= game.getWidth()) {
+            setY(game.getWidth() - getWidth());
+        }
+        
+        ballAni.tick();
     }
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.gray);
-        g.fillOval(x, y, width, height);
+        g.drawImage(ballAni.getCurrentFrame(), getX(), getY(), getWidth(), getHeight(), null);
+        //g.setColor(Color.gray);
+        //g.fillOval(x, y, width, height);
     }
 
     public int getxVel() {
