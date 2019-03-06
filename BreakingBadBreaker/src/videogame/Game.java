@@ -104,7 +104,7 @@ public class Game implements Runnable {
         pause = false;
         starting = true;
         score = 0;
-        combo = 1;
+        combo = 0;
         gameDone = false;
     }
 
@@ -185,7 +185,7 @@ public class Game implements Runnable {
         }
 
         if (ball.intersects(player) && !starting) {
-            combo = 1;
+            combo = 0;
             
             //Check if ball hits from up
             if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
@@ -212,13 +212,11 @@ public class Game implements Runnable {
             myBrick.tick();
 
             bricksDone = bricksDone && myBrick.isBroken();
-            
-            
-            
-            
+
             //Check if the ball collides with a brick
             if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
-                
+                combo++;
+
                 myBrick.setLives(myBrick.getLives()-1);
                 
                 if (myBrick.getLives() == 0) {
@@ -231,7 +229,6 @@ public class Game implements Runnable {
                     score += 50*combo;
                 }
                     
-                combo++;
                 
                 //Decide if create a powerup, chance is 1/2
                 boolean createPower = ((int) (Math.random() * 2)) == 0;
