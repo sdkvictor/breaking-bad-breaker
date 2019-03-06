@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  *
@@ -68,7 +69,7 @@ public class Game implements Runnable {
 
     private Player player;
     private ArrayList<Brick> bricks;
-    private ArrayList<PowerUp> powerups;
+    private LinkedList<PowerUp> powerups;
 
     private Ball ball;
     
@@ -95,7 +96,7 @@ public class Game implements Runnable {
         this.width = width;
         this.height = height;
         bricks = new ArrayList<>();
-        powerups = new ArrayList<>();
+        powerups = new LinkedList<>();
         running = false;
         keyManager = new KeyManager();
         mouseManager = new MouseManager();
@@ -201,25 +202,28 @@ public class Game implements Runnable {
         }
         
         boolean bricksDone = true;
-
+        
+        //Tick for all bricks
         for(int i=0; i<bricks.size(); i++){
             Brick myBrick = bricks.get(i);
             myBrick.tick();
 
             bricksDone = bricksDone && myBrick.isBroken();
             
-            //Decide if create a powerup, chance is 1/3
-            boolean createPower = ((int) (Math.random() * 3)) == 0;
             
-            if (createPower) {
-                powerups.add(new PowerUp(myBrick.getX(), myBrick.getY(), 50, 10, Assets.fastPower));
-            }
             
             
             //Check if the ball collides with a brick
             if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
                 
-                
+                //Decide if create a powerup, chance is 1/2
+                boolean createPower = ((int) (Math.random() * 2)) == 0;
+
+                if (createPower) {
+                    //Choose a random power
+                    int power = (int) (Math.random() * 2);
+                    powerups.add(new PowerUp(myBrick.getX(), myBrick.getY(), 60, 20, power));
+                }
                 //Increase score
                 score += 100;
                 
@@ -233,23 +237,43 @@ public class Game implements Runnable {
                 //Padding is the error tolerance of the collision of the ball with the left and right side of the bricks
                 int padding = 5;
 
-                boolean brickBetween = ball.getY()>myBrick.getY()+padding&&ball.getY()<myBrick.getY()+myBrick.getHeight()-padding;
-                boolean upBetween = ball.getY()+ball.getHeight()>myBrick.getY()+padding&&ball.getY()+ball.getHeight()<myBrick.getY()+myBrick.getHeight()-padding;
-                boolean downBetween = ball.getY()<myBrick.getY()&&ball.getY()+ball.getHeight()>myBrick.getY()+myBrick.getHeight();
+                boolean brickBetween = ball.getY() > myBrick.getY() + padding && ball.getY() < myBrick.getY() + myBrick.getHeight() - padding;
+                boolean upBetween = ball.getY() + ball.getHeight() > myBrick.getY() + padding&&ball.getY() + ball.getHeight() < myBrick.getY()
+                        + myBrick.getHeight() - padding;
+                boolean downBetween = ball.getY() < myBrick.getY() && ball.getY() + ball.getHeight() > myBrick.getY() + myBrick.getHeight();
 
-                
-                if(upBetween||downBetween||brickBetween){
+                //Check if the collision is on the side of the brick
+                if(upBetween || downBetween || brickBetween) {
+                    //If so invert the x speed of the ball
                     ball.setxVel(ball.getxVel() * -1);
                 }
                 else{
+                    //Else invert the y speed of the ball
                     ball.setyVel(ball.getyVel() * -1);               
-
                 }
             }
         }
         
+        //Tick for all powerups
         for (int i = 0; i < powerups.size(); i++) {
             PowerUp powerup = powerups.get(i);
+            
+            powerup.tick();
+            
+            if (powerup.intersects(player)) {
+                powerups.remove(i);
+                
+                //Check which power is activated
+                switch(powerup.power) {
+                    case speed:
+                        player.activateFastSpeed();
+                        break;
+                    
+                    case size:
+                        player.activateBigSize();
+                        break;
+                }
+            }
         }
         
         gameDone = bricksDone;
@@ -267,7 +291,7 @@ public class Game implements Runnable {
         if (keyManager.p) {
             pause = !pause;
         }
-    }
+    }    
 
     /**
      * renders all objects in a frame
@@ -287,6 +311,11 @@ public class Game implements Runnable {
             for (int i = 0; i < bricks.size(); i++) {
                 Brick myBrick = bricks.get(i);
                 myBrick.render(g);
+            }
+            
+            for (int i = 0; i < powerups.size(); i++) {
+                PowerUp powerup = powerups.get(i);
+                powerup.render(g);
             }
             
             g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));

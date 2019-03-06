@@ -16,11 +16,25 @@ public class PowerUp extends Item {
     
     private int speed;
     private BufferedImage image;
+    
+    public static enum Power {speed, size};
+    
+    Power power;
 
-    public PowerUp(int x, int y, int width, int height, BufferedImage image) {
+    public PowerUp(int x, int y, int width, int height, int power) {
         super(x, y, width, height);
-        this.image = image;
         speed = 5;
+        
+        switch(power) {
+            case 0:
+                this.power = Power.speed;
+                image = Assets.fastPower;
+                break;
+            case 1:
+                this.power = Power.size;
+                image = Assets.bigPower;
+                break;
+        }
     }
 
     @Override

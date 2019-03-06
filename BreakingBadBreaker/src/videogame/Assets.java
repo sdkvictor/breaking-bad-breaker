@@ -18,6 +18,7 @@ public class Assets {
     public static BufferedImage brick;
     public static BufferedImage life;
     public static BufferedImage fastPower;
+    public static BufferedImage bigPower;
     
     public static BufferedImage ballSprites;
     public static BufferedImage explosionSprites;
@@ -32,6 +33,7 @@ public class Assets {
         ballSprites = ImageLoader.loadImage("/images/ball_sprite.png");
         explosionSprites = ImageLoader.loadImage("/images/explosion_sprite.png");
         fastPower = ImageLoader.loadImage("/images/fastpower.png");
+        bigPower = ImageLoader.loadImage("/images/bigpower.png");
         
         SpriteSheet sheetBall = new SpriteSheet(ballSprites);
         SpriteSheet sheetExp = new SpriteSheet(explosionSprites);
