@@ -18,11 +18,15 @@ public class KeyManager implements KeyListener {
     public boolean right;
     
     public boolean p;
+    public boolean space;
     
     private boolean keys[];
     
+    private boolean prevp;
+    
     public KeyManager() {
         keys = new boolean[256];
+        prevp = false;
     }
 
     @Override
@@ -42,6 +46,18 @@ public class KeyManager implements KeyListener {
     public void tick() {
         left = keys[KeyEvent.VK_LEFT];
         right = keys[KeyEvent.VK_RIGHT];
-        p = keys[KeyEvent.VK_P];
+        
+        space = keys[KeyEvent.VK_SPACE];
+        
+        if (keys[KeyEvent.VK_P]) {
+            if (!prevp) {
+                p = true;
+                prevp = true;
+            } else {
+                p = false;
+            }
+        } else {
+            prevp = false;
+        }
     }
 }

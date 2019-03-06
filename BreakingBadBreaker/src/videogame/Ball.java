@@ -32,6 +32,12 @@ public class Ball extends Item {
 
     @Override
     public void tick() {
+        
+        if (game.getStarting()) {
+            setX(game.getPlayer().getX() + game.getPlayer().getWidth() / 2 - getWidth() / 2);
+            setY(game.getPlayer().getY() -  getHeight());
+        }
+        
         setX(getX() + xVel);
         setY(getY() + yVel);
         

@@ -5,6 +5,8 @@
  */
 package videogame;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
@@ -68,9 +70,11 @@ public class Game implements Runnable {
     
     private boolean brickBroke;
     private int numBrokenBricks;
+    
+    private boolean starting;
 
     /**
-     * to create title, width and height and set the game is still not running
+     * to create title, width and heigh t and set the game is still not running
      * 
      * @param title  to set the title of the window
      * @param width  to set the width of the window
@@ -85,6 +89,7 @@ public class Game implements Runnable {
         keyManager = new KeyManager();
         mouseManager = new MouseManager();
         pause = false;
+        starting = true;
     }
 
     /**
@@ -99,7 +104,7 @@ public class Game implements Runnable {
         int brickNum = 0;
         int row = 0;
         for (int i = 0; i < 30; i++) {
-            if(brickNum>=6){
+            if(brickNum >= 6){
                 brickNum = 0;
                 row++;
             }
@@ -123,14 +128,24 @@ public class Game implements Runnable {
      */
     private void tick() {
         if (pause) {
+            keyManager.tick();
+            if (keyManager.p) {
+                pause = !pause;
+            }
             return;
         }
         
         keyManager.tick();
         player.tick();
         ball.tick();
+        
+        if (starting) {
+            if (keyManager.space) {
+                starting = false;
+            }
+        }
 
-        if (ball.intersects(player)) {
+        if (ball.intersects(player) && !starting) {
 
             int totalLength = ball.getWidth() + player.getWidth();
             
@@ -153,7 +168,7 @@ public class Game implements Runnable {
         
         for(int i=0; i<bricks.size(); i++){
             Brick myBrick = bricks.get(i);
-            if(ball.intersects(myBrick)&&!brickBroke&&!myBrick.isBroken()){
+            if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
                 bricks.get(i).setBroken(true);
                 numBrokenBricks++;
                 brickBroke = true;
@@ -186,6 +201,13 @@ public class Game implements Runnable {
             for (int i = 0; i < bricks.size(); i++) {
                 Brick myBrick = bricks.get(i);
                 myBrick.render(g);
+            }
+            
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+            g.setColor(Color.white);
+            
+            if (pause) {
+                g.drawString("PAUSA", width/2, height/2);
             }
 
             bs.show();
@@ -235,6 +257,14 @@ public class Game implements Runnable {
      */
     public MouseManager getMouseManager() {
         return mouseManager;
+    }
+    
+    public boolean getStarting() {
+        return starting;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     /**
