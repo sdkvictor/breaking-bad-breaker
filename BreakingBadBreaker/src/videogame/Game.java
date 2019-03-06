@@ -96,6 +96,7 @@ public class Game implements Runnable {
 
         player = new Player(getWidth() / 2, 650, 150, 30, this);
         ball = new Ball(getWidth() / 2 - 25, getHeight() / 2 - 25, 50, 50, this);
+        //ball = new Ball(0, 200, 50, 50, this);
         int brickNum = 0;
         int row = 0;
         for (int i = 0; i < 30; i++) {
@@ -158,7 +159,27 @@ public class Game implements Runnable {
                 numBrokenBricks++;
                 brickBroke = true;
                 bricks.get(i).setBroken(true);
-                ball.setyVel(ball.getyVel() * -1);               
+                boolean brickBetween = false;
+                boolean upBetween = false;
+                boolean downBetween = false;
+                int padding = 5;
+                if(ball.getY()>myBrick.getY()+padding&&ball.getY()<myBrick.getY()+myBrick.getHeight()-padding){
+                    upBetween = true;
+                }
+                else if(ball.getY()+ball.getHeight()>myBrick.getY()+padding&&ball.getY()+ball.getHeight()<myBrick.getY()+myBrick.getHeight()-padding){
+                    downBetween = true;
+                }
+                else if(ball.getY()<myBrick.getY()&&ball.getY()+ball.getHeight()>myBrick.getY()+myBrick.getHeight()){
+                    brickBetween = true;
+                }
+                
+                if(upBetween||downBetween||brickBetween){
+                    ball.setxVel(ball.getxVel() * -1);
+                }
+                else{
+                    ball.setyVel(ball.getyVel() * -1);               
+
+                }
             }
         }
         brickBroke = false;
