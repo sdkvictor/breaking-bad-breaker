@@ -68,11 +68,13 @@ public class Game implements Runnable {
 
     private Player player;
     private ArrayList<Brick> bricks;
+    private ArrayList<PowerUp> powerups;
 
     private Ball ball;
     
     private boolean pause;
     private boolean gameOver;
+    private boolean gameDone;
     
     private boolean brickBroke;
     private int numBrokenBricks;
@@ -93,12 +95,14 @@ public class Game implements Runnable {
         this.width = width;
         this.height = height;
         bricks = new ArrayList<>();
+        powerups = new ArrayList<>();
         running = false;
         keyManager = new KeyManager();
         mouseManager = new MouseManager();
         pause = false;
         starting = true;
         score = 0;
+        gameDone = false;
     }
 
     /**
@@ -158,6 +162,15 @@ public class Game implements Runnable {
             return;
         }
         
+        if (gameDone) {
+            keyManager.tick();
+            if (keyManager.r) {
+                gameDone = false;
+                resetGame();
+            }
+            return;
+        }
+        
         keyManager.tick();
         player.tick();
         ball.tick();
@@ -187,31 +200,43 @@ public class Game implements Runnable {
             ball.setyVel(ball.getyVel() * -1);
         }
         
+        boolean bricksDone = true;
+
         for(int i=0; i<bricks.size(); i++){
             Brick myBrick = bricks.get(i);
             myBrick.tick();
+
+            bricksDone = bricksDone && myBrick.isBroken();
+            
+            //Decide if create a powerup, chance is 1/3
+            boolean createPower = ((int) (Math.random() * 3)) == 0;
+            
+            if (createPower) {
+                powerups.add(new PowerUp(myBrick.getX(), myBrick.getY(), 50, 10, Assets.fastPower));
+            }
+            
+            
+            //Check if the ball collides with a brick
             if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
+                
+                
+                //Increase score
                 score += 100;
-                bricks.get(i).setBroken(true);
+                
+                myBrick.setBroken(true);
                 numBrokenBricks++;
                 brickBroke = true;
-                bricks.get(i).setBroken(true);
+
+                //Indicate that the brick has recently been broken
+                myBrick.setRecentBroken(true);
                 
-                bricks.get(i).setRecentBroken(true);
-                
-                boolean brickBetween = false;
-                boolean upBetween = false;
-                boolean downBetween = false;
+                //Padding is the error tolerance of the collision of the ball with the left and right side of the bricks
                 int padding = 5;
-                if(ball.getY()>myBrick.getY()+padding&&ball.getY()<myBrick.getY()+myBrick.getHeight()-padding){
-                    upBetween = true;
-                }
-                else if(ball.getY()+ball.getHeight()>myBrick.getY()+padding&&ball.getY()+ball.getHeight()<myBrick.getY()+myBrick.getHeight()-padding){
-                    downBetween = true;
-                }
-                else if(ball.getY()<myBrick.getY()&&ball.getY()+ball.getHeight()>myBrick.getY()+myBrick.getHeight()){
-                    brickBetween = true;
-                }
+
+                boolean brickBetween = ball.getY()>myBrick.getY()+padding&&ball.getY()<myBrick.getY()+myBrick.getHeight()-padding;
+                boolean upBetween = ball.getY()+ball.getHeight()>myBrick.getY()+padding&&ball.getY()+ball.getHeight()<myBrick.getY()+myBrick.getHeight()-padding;
+                boolean downBetween = ball.getY()<myBrick.getY()&&ball.getY()+ball.getHeight()>myBrick.getY()+myBrick.getHeight();
+
                 
                 if(upBetween||downBetween||brickBetween){
                     ball.setxVel(ball.getxVel() * -1);
@@ -222,6 +247,12 @@ public class Game implements Runnable {
                 }
             }
         }
+        
+        for (int i = 0; i < powerups.size(); i++) {
+            PowerUp powerup = powerups.get(i);
+        }
+        
+        gameDone = bricksDone;
         
         brickBroke = false;
         if (ball.getY() + ball.getHeight() > getHeight()) {
@@ -271,12 +302,18 @@ public class Game implements Runnable {
                 g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
                 g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                 g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
-
             }
             
             if (pause) {
                 g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                 g.drawString("PAUSA", width/2 - 200, height/2 + 50);
+            }
+            
+            if (gameDone) {
+                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+                g.drawString("YOU WIN!", width/2 - 250, height/2 + 50);
+                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
             }
 
             bs.show();
