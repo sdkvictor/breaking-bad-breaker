@@ -7,7 +7,6 @@ package videogame;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 /**
  *
@@ -17,11 +16,14 @@ public class Player extends Item {
     
     private Game game;
     private int speed;
+    
+    private int lives;
 
     public Player(int x, int y, int width, int height, Game game) {
         super(x, y, width, height);
         this.game = game;
-        this.speed = 10;
+        speed = 10;
+        lives = 3;
     }
 
     @Override
@@ -50,5 +52,11 @@ public class Player extends Item {
         g.fillRect(getX(), getY(), getWidth(), getHeight());
     }
 
+    public int getLives() {
+        return lives;
+    }
 
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
 }

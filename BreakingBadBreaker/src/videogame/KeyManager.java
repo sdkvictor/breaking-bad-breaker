@@ -18,11 +18,16 @@ public class KeyManager implements KeyListener {
     public boolean right;
     
     public boolean p;
+    public boolean r;
+    public boolean g;
+    public boolean c;
     public boolean space;
     
     private boolean keys[];
     
     private boolean prevp;
+    private boolean prevg;
+    private boolean prevc;
     
     public KeyManager() {
         keys = new boolean[256];
@@ -49,6 +54,9 @@ public class KeyManager implements KeyListener {
         
         space = keys[KeyEvent.VK_SPACE];
         
+        r = keys[KeyEvent.VK_R];
+        g = keys[KeyEvent.VK_G];
+        
         if (keys[KeyEvent.VK_P]) {
             if (!prevp) {
                 p = true;
@@ -59,5 +67,28 @@ public class KeyManager implements KeyListener {
         } else {
             prevp = false;
         }
+        
+        if (keys[KeyEvent.VK_G]) {
+            if (!prevg) {
+                g = true;
+                prevg = true;
+            } else {
+                g = false;
+            }
+        } else {
+            prevg = false;
+        }
+        
+        if (keys[KeyEvent.VK_C]) {
+            if (!prevc) {
+                c = true;
+                prevc = true;
+            } else {
+                c = false;
+            }
+        } else {
+            prevc = false;
+        }
+  
     }
 }

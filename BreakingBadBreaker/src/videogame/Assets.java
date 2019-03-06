@@ -15,9 +15,12 @@ public class Assets {
 
     public static BufferedImage background;
     public static BufferedImage player;
+    public static BufferedImage life;
     
     public static void init() {
         background = ImageLoader.loadImage("/images/background.jpg");
+        life = ImageLoader.loadImage("/images/heart.png");
         //player = ImageLoader.loadImage("/images/mario.png");
+        
     }
 }

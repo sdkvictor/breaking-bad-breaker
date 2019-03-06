@@ -10,7 +10,13 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
-import java.util.LinkedList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  *
@@ -61,7 +67,7 @@ public class Game implements Runnable {
     private MouseManager mouseManager;
 
     private Player player;
-    private LinkedList<Brick> bricks;
+    private ArrayList<Brick> bricks;
 
     private Ball ball;
     
@@ -72,6 +78,8 @@ public class Game implements Runnable {
     private int numBrokenBricks;
     
     private boolean starting;
+    
+    private int score;
 
     /**
      * to create title, width and heigh t and set the game is still not running
@@ -84,12 +92,13 @@ public class Game implements Runnable {
         this.title = title;
         this.width = width;
         this.height = height;
-        bricks = new LinkedList<Brick>();
+        bricks = new ArrayList<>();
         running = false;
         keyManager = new KeyManager();
         mouseManager = new MouseManager();
         pause = false;
         starting = true;
+        score = 0;
     }
 
     /**
@@ -119,21 +128,36 @@ public class Game implements Runnable {
         display.getJframe().addMouseMotionListener(mouseManager);
         display.getCanvas().addMouseListener(mouseManager);
         display.getCanvas().addMouseMotionListener(mouseManager);
-
-        setItemsPositions();
+        
+        resetPositions();
     }
 
     /**
      * updates all objects on a frame
      */
     private void tick() {
+        if (gameOver) {
+            keyManager.tick();
+            if (keyManager.r) {
+                gameOver = false;
+                resetGame();
+            }
+            return;
+        }
+        
         if (pause) {
             keyManager.tick();
+            if (keyManager.g)
+                saveGame();
+            if (keyManager.c)
+                loadGame();
             if (keyManager.p) {
                 pause = !pause;
             }
             return;
         }
+        
+        
         
         keyManager.tick();
         player.tick();
@@ -146,8 +170,6 @@ public class Game implements Runnable {
         }
 
         if (ball.intersects(player) && !starting) {
-
-            int totalLength = ball.getWidth() + player.getWidth();
             
             //Check if ball hits from up
             if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
@@ -169,6 +191,7 @@ public class Game implements Runnable {
         for(int i=0; i<bricks.size(); i++){
             Brick myBrick = bricks.get(i);
             if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
+                score += 100;
                 bricks.get(i).setBroken(true);
                 numBrokenBricks++;
                 brickBroke = true;
@@ -176,7 +199,16 @@ public class Game implements Runnable {
                 ball.setyVel(ball.getyVel() * -1);               
             }
         }
+        
         brickBroke = false;
+        if (ball.getY() + ball.getHeight() > getHeight()) {
+            player.setLives(player.getLives()-1);
+            resetPositions();
+        }
+        
+        if (player.getLives() <= 0) {
+            gameOver = true;
+        }
         
         if (keyManager.p) {
             pause = !pause;
@@ -203,24 +235,103 @@ public class Game implements Runnable {
                 myBrick.render(g);
             }
             
-            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
             g.setColor(Color.white);
+            g.drawString("Score: " + Integer.toString(score), 40, 50);
+            
+            for (int i = 0; i < player.getLives(); i++) {
+                g.drawImage(Assets.life, 15 + 40*i, getHeight() - 40, 40, 40, null);
+            }
+            
+            if (gameOver) {
+                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+                g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
+                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+
+            }
             
             if (pause) {
-                g.drawString("PAUSA", width/2, height/2);
+                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+                g.drawString("PAUSA", width/2 - 200, height/2 + 50);
             }
 
             bs.show();
             g.dispose();
-
         }
+    }
+    
+    /**
+     * Reset all game attributes to start a new game
+     */
+    void resetGame() {
+        score = 0;
+        
+        for (int i = 0; i < bricks.size(); i++) {
+            Brick myBrick = bricks.get(i);
+            myBrick.setBroken(false);
+        }
+        
+        player.setLives(3);
+        resetPositions();
     }
 
     /**
-     * Initialize the positions of the current items
+     * Reset movable objects to initial positions
      */
-    void setItemsPositions() {
+    void resetPositions() {
+        starting = true;
+        player.setX(getWidth() / 2 - player.getWidth() / 2);
+    }
+    
+    private void saveGame() {
+        try {
+            PrintWriter pw = new PrintWriter(new FileWriter("game.txt"));
+            
+            pw.println(Integer.toString(player.getLives()));
+            pw.println(Integer.toString(player.getX()));
+            pw.println(Integer.toString(player.getY()));
+            pw.println(Integer.toString(ball.getX()));
+            pw.println(Integer.toString(ball.getY()));
+            pw.println(Integer.toString(ball.getxVel()));
+            pw.println(Integer.toString(ball.getyVel()));
+            
+            for (int i = 0; i < bricks.size(); i++) {
+                Brick myBrick = bricks.get(i);
+                pw.println(Integer.toString(myBrick.isBroken() ? 0 : 1));
+            }
+            pw.println(Integer.toString(score));
+            pw.close();
+            System.out.println("SAVING...");
 
+        } catch(IOException e) {
+            System.out.println("BEEP BEEP");
+            System.out.println(e.toString());
+        }
+    }
+    
+    private void loadGame() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("game.txt"));
+            player.setLives(Integer.parseInt(br.readLine()));
+            player.setX(Integer.parseInt(br.readLine()));
+            player.setY(Integer.parseInt(br.readLine()));
+            ball.setX(Integer.parseInt(br.readLine()));
+            ball.setY(Integer.parseInt(br.readLine()));
+            ball.setxVel(Integer.parseInt(br.readLine()));
+            ball.setyVel(Integer.parseInt(br.readLine()));
+            
+            for (int i = 0; i < bricks.size(); i++) {
+                Brick myBrick = bricks.get(i);
+                myBrick.setBroken(Integer.parseInt(br.readLine()) == 0);
+            }
+            
+            score = Integer.parseInt(br.readLine());
+            
+        } catch (IOException e) {
+            System.out.println("BEEP BEEP");
+            System.out.println(e.toString());
+        }
     }
 
     /**
