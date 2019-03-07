@@ -292,7 +292,6 @@ public class Game implements Runnable {
             for(int i=0; i<bricks.size(); i++){
                 Brick myBrick = bricks.get(i);
                 myBrick.tick();
-                
                 bricksDone = bricksDone && myBrick.isBroken();
 
                 //Check if the ball collides with a brick
@@ -374,19 +373,20 @@ public class Game implements Runnable {
                     }
                 }
             }
-
+            //check if the player won the game yet
             gameDone = bricksDone;
 
             brickBroke = false;
+            //take one life from the player if it reaches the ground and reset positions of the items
             if (ball.getY() + ball.getHeight() > getHeight()) {
                 player.setLives(player.getLives()-1);
                 resetPositions();
             }
-
+            //game is over if the player loses all their lives
             if (player.getLives() <= 0) {
                 gameOver = true;
             }
-
+            //change the pause status if p key is pressed
             if (keyManager.p) {
                 pause = !pause;
             }
@@ -404,72 +404,91 @@ public class Game implements Runnable {
         if (bs == null) {
             display.getCanvas().createBufferStrategy(3);
         } else {
+            //if the game hasn't started yet and the start screen should be on
             if(!gameStart){
                 g = bs.getDrawGraphics();
                 g.clearRect(0, 0, width, height);
+                //render the start screen
                 g.drawImage(Assets.startScreen, 0, 0, width, height, null);
             }
+            //if the first instructions haven't been seen yet
             else if(!firstInstructions){
                 g = bs.getDrawGraphics();
                 g.clearRect(0, 0, width, height);
+                //render the instructions
                 g.drawImage(Assets.instructions, 0, 0, width, height, null);
             }
+            //if start screen and first instrutions have been closed
             else{
                 g = bs.getDrawGraphics();
                 g.clearRect(0, 0, width, height);
+                //render the background, player and ball
                 g.drawImage(Assets.background, 0, 0, width, height, null);
                 player.render(g);
                 ball.render(g);
+                //render all the bricks
                 for (int i = 0; i < bricks.size(); i++) {
                     Brick myBrick = bricks.get(i);
                     myBrick.render(g);
                 }
-
+                //render all the powerups
                 for (int i = 0; i < powerups.size(); i++) {
                     PowerUp powerup = powerups.get(i);
                     powerup.render(g);
                 }
-
+                //Display the current score on the screen
                 g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                 g.setColor(Color.white);
                 g.drawString("Score: " + Integer.toString(score), 40, 50);
+                //if the combo is bigger than 1
                 if(combo>1){
+                    //display the combo count
                     g.drawString("Combo: x" + Integer.toString(combo), 40, 80);
 
                 }
-
+                //render all the remaining lives of the player
                 for (int i = 0; i < player.getLives(); i++) {
                     g.drawImage(Assets.life, 250 + 40*i, 20, 40, 40, null);
                 }
-                
+                //if instructions are opened in pause menu
                 if(pauseInstructions){
+                    //render the instructions
                     g.clearRect(0, 0, width, height);
                     g.drawImage(Assets.instructions, 0, 0, width, height, null);
                 }
-                //all player lives were used
+                //if all player lives were used
                 if (gameOver) {
+                    //display "game over"
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
+                    //show instructions to restart the game
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                    //show final score
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Final Score: " + score, width/2 - 120, height/2 + 150);
+                    //show the maximum combo reached
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
                 }
-
+                //if pause menu is on and the instructions are closed
                 if (pause&&!pauseInstructions) {
+                    //show the message "PAUSA"
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("PAUSA", width/2 - 200, height/2 + 50);
                 }
-                //all bricks were destroyed
+                //if all bricks were destroyed
                 if (gameDone) {
+                    //display "you win!" as the player won the game
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("YOU WIN!", width/2 - 250, height/2 + 50);
+                    //show instructions to restart the game
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                    //show final score and multiply it by the remaining lives of the player
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Final Score: " + score*player.getLives(), width/2 - 120, height/2 + 150);
+                    //show the maximum combo reached
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
                 }
