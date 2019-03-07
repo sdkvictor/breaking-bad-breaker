@@ -515,8 +515,10 @@ public class Game implements Runnable {
      */
     private void saveGame() {
         try {
+            //Open text file
             PrintWriter pw = new PrintWriter(new FileWriter("game.txt"));
             
+            //Write x and y values for player and ball
             pw.println(Integer.toString(player.getLives()));
             pw.println(Integer.toString(player.getX()));
             pw.println(Integer.toString(player.getY()));
@@ -525,6 +527,9 @@ public class Game implements Runnable {
             pw.println(Integer.toString(ball.getxVel()));
             pw.println(Integer.toString(ball.getyVel()));
             
+            //
+            //Save powerup status for the player
+            //
             if (player.isIsSpeedPower()) {
                 pw.println(Integer.toString(1));
                 pw.println(Integer.toString(player.getSpeedCounter()));
@@ -533,6 +538,9 @@ public class Game implements Runnable {
                 pw.println(Integer.toString(0));
             }
             
+            //
+            //Save powerup status for the player
+            //
             if (player.isIsSizePower()) {
                 pw.println(Integer.toString(1));
                 pw.println(Integer.toString(player.getSizeCounter()));
@@ -541,14 +549,17 @@ public class Game implements Runnable {
                 pw.println(Integer.toString(0));
             }
             
+            //Save all bricks' status
             for (int i = 0; i < bricks.size(); i++) {
                 Brick myBrick = bricks.get(i);
                 pw.println(Integer.toString(myBrick.getLives()));
                 pw.println(Integer.toString(myBrick.isBroken() ? 0 : 1));
             }
             
+            //Save the amount of powerups currently on the screen
             pw.println(Integer.toString(powerups.size()));
             
+            //Save the position and types of the powerups in the screen
             for (int i = 0; i < powerups.size(); i++) {
                 PowerUp powerup = powerups.get(i);
                 pw.println(Integer.toString(powerup.getX()));
@@ -564,6 +575,7 @@ public class Game implements Runnable {
                 }
             }
             
+            //Save score
             pw.println(Integer.toString(score));
             pw.close();
             System.out.println("SAVING...");
@@ -582,7 +594,10 @@ public class Game implements Runnable {
     
     private void loadGame() {
         try {
+            //Open file to load game
             BufferedReader br = new BufferedReader(new FileReader("game.txt"));
+            
+            //Load player and ball x and y positions
             player.setLives(Integer.parseInt(br.readLine()));
             player.setX(Integer.parseInt(br.readLine()));
             player.setY(Integer.parseInt(br.readLine()));
@@ -591,12 +606,16 @@ public class Game implements Runnable {
             ball.setxVel(Integer.parseInt(br.readLine()));
             ball.setyVel(Integer.parseInt(br.readLine()));
             
+            //
+            // Set powerups
+            //
             player.setIsSpeedPower(Integer.parseInt(br.readLine()) == 1);
             
             if (player.isIsSpeedPower()) {
                 player.activateFastSpeed();
             }
             
+            //Set the counter of the powerup to is previous status
             player.setSpeedCounter(Integer.parseInt(br.readLine()));
             
             player.setIsSizePower(Integer.parseInt(br.readLine()) == 1);
@@ -605,18 +624,23 @@ public class Game implements Runnable {
                 player.activateFastSpeed();
             }
             
+            //Set the counter of the powerup to is previous status
             player.setSizeCounter(Integer.parseInt(br.readLine()));
             
+            //Load brick data
             for (int i = 0; i < bricks.size(); i++) {
                 Brick myBrick = bricks.get(i);
                 myBrick.setLives(Integer.parseInt(br.readLine()));
                 myBrick.setBroken(Integer.parseInt(br.readLine()) == 0);
             }
             
+            //Clear the current powerups in the screen to load the new ones
             powerups.clear();
             
+            //The amount of powerups to load
             int size = Integer.parseInt(br.readLine());
             
+            //Load all powerups
             for (int i = 0; i < size; i++) {
                 int x = Integer.parseInt(br.readLine());
                 int y = Integer.parseInt(br.readLine());
@@ -624,6 +648,7 @@ public class Game implements Runnable {
                 powerups.add(new PowerUp(x, y, 60, 20, power));
             }
             
+            //Load score
             score = Integer.parseInt(br.readLine());
             
         } catch (IOException e) {
