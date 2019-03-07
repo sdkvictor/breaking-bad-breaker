@@ -29,6 +29,9 @@ public class Assets {
     
     public static BufferedImage startScreen;
     
+    public static SoundClip explosionSound;
+    public static SoundClip backMusic;
+    
     public static void init() {
         background = ImageLoader.loadImage("/images/back_break.jpg");
         life = ImageLoader.loadImage("/images/heart.png");
@@ -38,6 +41,9 @@ public class Assets {
         explosionSprites = ImageLoader.loadImage("/images/explosion_sprite.png");
         fastPower = ImageLoader.loadImage("/images/fastpower.png");
         bigPower = ImageLoader.loadImage("/images/bigpower.png");
+        
+        explosionSound = new SoundClip("/sounds/explosion.wav");
+        backMusic = new SoundClip("/sounds/theme.wav");
         
         SpriteSheet sheetBall = new SpriteSheet(ballSprites);
         SpriteSheet sheetExp = new SpriteSheet(explosionSprites);
@@ -62,7 +68,7 @@ public class Assets {
         animationBall[10] = sheetBall.crop(29, 231, 50, 50);
         animationBall[9] = sheetBall.crop(135, 232, 48, 48);
         
-        startScreen = ImageLoader.loadImage("/images/startScreen.png");
+        startScreen = ImageLoader.loadImage("/images/startscreen.png");
         int count = 0;
         
         for (int i = 0; i < 4; i++) {
@@ -74,7 +80,7 @@ public class Assets {
             }
         }
         
-        //player = ImageLoader.loadImage("/images/mario.png");
+        player = ImageLoader.loadImage("/images/needle.png");
         
     }
 }

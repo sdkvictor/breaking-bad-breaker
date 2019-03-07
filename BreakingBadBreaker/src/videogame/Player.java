@@ -69,7 +69,6 @@ public class Player extends Item {
                 speed = origSpeed;
                 speedCounter = 0;
                 isSpeedPower = false;
-                System.out.println("SPEEED OFF");
             }
         }
         
@@ -80,7 +79,6 @@ public class Player extends Item {
                 width = origSize;
                 sizeCounter = 0;
                 isSizePower = false;
-                System.out.println("SIZE OFF");
             }
         }
     }
@@ -88,7 +86,7 @@ public class Player extends Item {
     @Override
     public void render(Graphics g) {
         g.setColor(Color.white);
-        g.fillRect(getX(), getY(), getWidth(), getHeight());
+        g.drawImage(Assets.player, getX(), getY(), getWidth(), getHeight(), null);
         
         if (isSpeedPower) {
             g.drawImage(Assets.fastPower, 900, 40, 100, 35, null);
@@ -125,5 +123,37 @@ public class Player extends Item {
 
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public boolean isIsSpeedPower() {
+        return isSpeedPower;
+    }
+
+    public boolean isIsSizePower() {
+        return isSizePower;
+    }
+
+    public void setIsSizePower(boolean isSizePower) {
+        this.isSizePower = isSizePower;
+    }
+
+    public void setIsSpeedPower(boolean isSpeedPower) {
+        this.isSpeedPower = isSpeedPower;
+    }
+
+    public int getSpeedCounter() {
+        return speedCounter;
+    }
+
+    public int getSizeCounter() {
+        return sizeCounter;
+    }
+
+    public void setSpeedCounter(int speedCounter) {
+        this.speedCounter = speedCounter;
+    }
+
+    public void setSizeCounter(int sizeCounter) {
+        this.sizeCounter = sizeCounter;
     }
 }
