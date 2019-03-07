@@ -64,17 +64,17 @@ public class Game implements Runnable {
     private Thread thread;
     private boolean running;
 
-    private KeyManager keyManager;
-    private MouseManager mouseManager;
+    private KeyManager keyManager; //to manage key inputs
+    private MouseManager mouseManager;//to use the mouse
 
-    private Player player;
-    private ArrayList<Brick> bricks;
-    private LinkedList<PowerUp> powerups;
-
+    private Player player; //player's paddle
+    private ArrayList<Brick> bricks; //array of bricks
+    private LinkedList<PowerUp> powerups; //array of powerups
+ 
     private Ball ball;
     
     private boolean pause;
-    private boolean gameOver;
+    private boolean gameOver; //whether the game is over
     private boolean gameDone;
     
     private boolean brickBroke;
@@ -82,13 +82,13 @@ public class Game implements Runnable {
     
     private boolean starting;
     
-    private int score; //puntuación actual
-    private int combo; //combo actual
-    private int maxCombo; //combo maximo alcanzado
+    private int score; //current score
+    private int combo; //current combo
+    private int maxCombo; //maximum combo reached
 
-    private boolean gameStart; //el juego comienza
-    private boolean firstInstructions; //primera pantalla de instrucciones
-    private boolean pauseInstructions; //instrucciones desde el menú de pausa
+    private boolean gameStart; //the game starts
+    private boolean firstInstructions; //first instrutions screen
+    private boolean pauseInstructions; //instructions from pause menu
     /**
      * to create title, width and heigh t and set the game is still not running
      * 
@@ -107,10 +107,10 @@ public class Game implements Runnable {
         mouseManager = new MouseManager();
         pause = false;
         starting = true;
-        score = 0;
-        combo = 0;
+        score = 0; //initialize score as 0
+        combo = 0; //initialize combo as 0
         gameDone = false;
-        maxCombo = 0;
+        maxCombo = 0; //initialize maxCombo as 0
         gameStart = false;
         firstInstructions = false;
         pauseInstructions = false;
@@ -123,19 +123,24 @@ public class Game implements Runnable {
         display = new Display(title, width, height);
         Assets.init();
 
-        player = new Player(getWidth() / 2, 650, 150, 30, this);
-        ball = new Ball(getWidth() / 2 - 25, getHeight() / 2 - 25, 50, 50, this);
-        
+        player = new Player(getWidth() / 2, 650, 150, 30, this); //creates a player
+        ball = new Ball(getWidth() / 2 - 25, getHeight() / 2 - 25, 50, 50, this); //creates a ball
+        //makes the array of bricks to start the game
         int brickNum = 0;
         int row = 0;
+        //24 total bricks
         for (int i = 0; i < 24; i++) {
+            //6 bricks per row
             if(brickNum >= 6){
                 brickNum = 0;
                 row++;
             }
+            //adds a brick to the array in the next position
             bricks.add(new Brick(100+brickNum*173, 100+row*75, 100, 50, this));
+            //increase number of current bricks
             brickNum++;
         }
+        //initialize all bricks as not broken
         brickBroke = false;
         numBrokenBricks = 0;
 
@@ -145,6 +150,7 @@ public class Game implements Runnable {
         display.getCanvas().addMouseListener(mouseManager);
         display.getCanvas().addMouseMotionListener(mouseManager);
         
+        //reset all the positions of the items
         resetPositions();
         
         Assets.backMusic.setLooping(true);
@@ -155,38 +161,54 @@ public class Game implements Runnable {
      * updates all objects on a frame
      */
     private void tick() {
+        //if the game is over
         if (gameOver) {
             keyManager.tick();
+            //if presses r
             if (keyManager.r) {
                 gameOver = false;
+                //starts a new game
                 resetGame();
             }
             return;
         }
         
+        //if the game is paused
         if (pause) {
             keyManager.tick();
+            //if g key is pressed
             if (keyManager.g)
+                //make a save file
                 saveGame();
+            //if c key is pressed
             if (keyManager.c)
+                //load the save file
                 loadGame();
+            //if i key is pressed
             if  (keyManager.i){
+                //set the pause instructions to true to be displayed
                 pauseInstructions = true;
             }
+            //if pause instructions are open
             if  (pauseInstructions){
+                //if x key is pressed
                 if(keyManager.x){
+                    //set pause instructions to false to close
                     pauseInstructions = false;
                 }
             }
+            //if p key is pressed while pause instructions are closed
             if (keyManager.p && !pauseInstructions) {
+                //change the status of pause to its opposite boolean value
                 pause = !pause;
             }
             return;
         }
-        
+        //if the game is done
         if (gameDone) {
             keyManager.tick();
             if (keyManager.r) {
+                //reset the game if r key is pressed
                 gameDone = false;
                 resetGame();
             }
@@ -194,35 +216,44 @@ public class Game implements Runnable {
         }
         
         keyManager.tick();
-        
+        //if the game hasn't started
         if(!gameStart){
+            //if enter key is pressed
             if(keyManager.enter){
+                //start the game
                 gameStart = true;
             }
         }
+        //if the first instructions haven't been closed
         if(!firstInstructions){
             if(keyManager.x){
+                //close them if x is pressed
                 firstInstructions = true;
             }
         }
         
+        //if the game started and the first instructions were already seen
         if(gameStart&&firstInstructions){
+            //tick player and ball items
             player.tick();
             ball.tick();
-
+            //if the game just started and the ball is with the player
             if (starting) {
                 if (keyManager.space) {
+                    //start the game after pressing the space bar
                     starting = false;
                 }
             }
-
+            //if the player intersects with the ball and the game is not just starting
             if (ball.intersects(player) && !starting) {
-                combo = 0;
-                int pad = 10;
-
+                combo = 0; //reset the combo
+                int pad = 10; //Padding is the error tolerance of the collision of the ball with the left and right side of the player
+                //verify if the player is bewteen the upper and the lower edge of the ball
                 boolean playerBetween = ball.getY() > player.getY() + pad && ball.getY() < player.getY() + player.getHeight() - pad;
+                //verify if the ball's upper edge is bewteen the player's height
                 boolean upBetweenPlayer = ball.getY() + ball.getHeight() > player.getY() + pad&&ball.getY() + ball.getHeight() < player.getY()
-                            + player.getHeight() - pad;
+                            + player.getHeight() - pad;               
+                //verify if the ball's lower edge is between the player's height
                 boolean downBetweenPlayer = ball.getY() < player.getY() && ball.getY() + ball.getHeight() > player.getY() + player.getHeight();
                 //Check if the ball hits from aside
                 if(playerBetween || upBetweenPlayer || downBetweenPlayer){
@@ -261,16 +292,18 @@ public class Game implements Runnable {
             for(int i=0; i<bricks.size(); i++){
                 Brick myBrick = bricks.get(i);
                 myBrick.tick();
-
+                
                 bricksDone = bricksDone && myBrick.isBroken();
 
                 //Check if the ball collides with a brick
                 if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
+                    //increase the combo by 1
                     combo++;
+                    //check if the max combo needs to be updated
                     if(combo>maxCombo){
                         maxCombo = combo;
                     }
-
+                    //decreases one live out of the 2 lives of the brick 
                     myBrick.setLives(myBrick.getLives()-1);
 
                     if (myBrick.getLives() == 0) {
@@ -278,6 +311,7 @@ public class Game implements Runnable {
                         myBrick.setRecentBroken(true);
                         //Set it to permanently broken
                         myBrick.setBroken(true);
+                        //increase the score by 200 times the current combo
                         score += 200*combo;
                         Assets.explosionSound.play();
                     } else {
@@ -299,10 +333,12 @@ public class Game implements Runnable {
 
                     //Padding is the error tolerance of the collision of the ball with the left and right side of the bricks
                     int padding = 5;
-
+                    //verify if the brick is bewteen the upper and the lower edge of the ball
                     boolean brickBetween = ball.getY() > myBrick.getY() + padding && ball.getY() < myBrick.getY() + myBrick.getHeight() - padding;
+                    //verify if the ball's upper edge is bewteen the bricks's height
                     boolean upBetween = ball.getY() + ball.getHeight() > myBrick.getY() + padding&&ball.getY() + ball.getHeight() < myBrick.getY()
                             + myBrick.getHeight() - padding;
+                    //verify if the ball's lower edge is bewteen the bricks's height
                     boolean downBetween = ball.getY() < myBrick.getY() && ball.getY() + ball.getHeight() > myBrick.getY() + myBrick.getHeight();
 
                     //Check if the collision is on the side of the brick
@@ -410,7 +446,7 @@ public class Game implements Runnable {
                     g.clearRect(0, 0, width, height);
                     g.drawImage(Assets.instructions, 0, 0, width, height, null);
                 }
-
+                //all player lives were used
                 if (gameOver) {
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
@@ -426,14 +462,14 @@ public class Game implements Runnable {
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("PAUSA", width/2 - 200, height/2 + 50);
                 }
-
+                //all bricks were destroyed
                 if (gameDone) {
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("YOU WIN!", width/2 - 250, height/2 + 50);
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
-                    g.drawString("Final Score: " + score, width/2 - 120, height/2 + 150);
+                    g.drawString("Final Score: " + score*player.getLives(), width/2 - 120, height/2 + 150);
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
                 }

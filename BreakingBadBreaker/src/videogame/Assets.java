@@ -13,19 +13,19 @@ import java.awt.image.BufferedImage;
  */
 public class Assets {
 
-    public static BufferedImage background;
-    public static BufferedImage player;
-    public static BufferedImage brick;
-    public static BufferedImage brickHalf;
-    public static BufferedImage life;
-    public static BufferedImage fastPower;
-    public static BufferedImage bigPower;
+    public static BufferedImage background; //background image
+    public static BufferedImage player; //player paddle image
+    public static BufferedImage brick; //brick sprite
+    public static BufferedImage brickHalf; //brick sprite after a first hit
+    public static BufferedImage life; //lives sprite
+    public static BufferedImage fastPower; //powerup to increase player's speed
+    public static BufferedImage bigPower; //powerup to increase player's size
     
-    public static BufferedImage ballSprites;
-    public static BufferedImage explosionSprites;
+    public static BufferedImage ballSprites; //contains all the sprites of the ball's animation
+    public static BufferedImage explosionSprites; //contains all the sprites of the explosion after destroying a brick
     
-    public static BufferedImage animationBall[];
-    public static BufferedImage animationExplosion[];
+    public static BufferedImage animationBall[]; //array of ball's animation sprites
+    public static BufferedImage animationExplosion[]; //array of explosion's animation sprites
     
     public static BufferedImage startScreen;
     public static BufferedImage instructions;
