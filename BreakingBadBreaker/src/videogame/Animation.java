@@ -12,10 +12,10 @@ import java.awt.image.BufferedImage;
  * @author charles
  */
 public class Animation {
-    private int speed;
-    private int index;
-    private long lastTime;
-    private long timer;
+    private int speed; //animation speed
+    private int index; // number of the animation frame
+    private long lastTime; //last ticked time
+    private long timer; //curent time
     
     private boolean done;
     
