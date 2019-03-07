@@ -16,7 +16,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -143,6 +142,9 @@ public class Game implements Runnable {
         display.getCanvas().addMouseMotionListener(mouseManager);
         
         resetPositions();
+        
+        Assets.backMusic.setLooping(true);
+        Assets.backMusic.play();
     }
 
     /**
@@ -260,6 +262,7 @@ public class Game implements Runnable {
                         //Set it to permanently broken
                         myBrick.setBroken(true);
                         score += 200*combo;
+                        Assets.explosionSound.play();
                     } else {
                         score += 50*combo;
                     }
@@ -454,8 +457,25 @@ public class Game implements Runnable {
             pw.println(Integer.toString(ball.getxVel()));
             pw.println(Integer.toString(ball.getyVel()));
             
+            if (player.isIsSpeedPower()) {
+                pw.println(Integer.toString(1));
+                pw.println(Integer.toString(player.getSpeedCounter()));
+            } else {
+                pw.println(Integer.toString(0));
+                pw.println(Integer.toString(0));
+            }
+            
+            if (player.isIsSizePower()) {
+                pw.println(Integer.toString(1));
+                pw.println(Integer.toString(player.getSizeCounter()));
+            } else {
+                pw.println(Integer.toString(0));
+                pw.println(Integer.toString(0));
+            }
+            
             for (int i = 0; i < bricks.size(); i++) {
                 Brick myBrick = bricks.get(i);
+                pw.println(Integer.toString(myBrick.getLives()));
                 pw.println(Integer.toString(myBrick.isBroken() ? 0 : 1));
             }
             pw.println(Integer.toString(score));
@@ -479,8 +499,25 @@ public class Game implements Runnable {
             ball.setxVel(Integer.parseInt(br.readLine()));
             ball.setyVel(Integer.parseInt(br.readLine()));
             
+            player.setIsSpeedPower(Integer.parseInt(br.readLine()) == 1);
+            
+            if (player.isIsSpeedPower()) {
+                player.activateFastSpeed();
+            }
+            
+            player.setSpeedCounter(Integer.parseInt(br.readLine()));
+            
+            player.setIsSizePower(Integer.parseInt(br.readLine()) == 1);
+            
+            if (player.isIsSizePower()) {
+                player.activateFastSpeed();
+            }
+            
+            player.setSizeCounter(Integer.parseInt(br.readLine()));
+            
             for (int i = 0; i < bricks.size(); i++) {
                 Brick myBrick = bricks.get(i);
+                myBrick.setLives(Integer.parseInt(br.readLine()));
                 myBrick.setBroken(Integer.parseInt(br.readLine()) == 0);
             }
             
