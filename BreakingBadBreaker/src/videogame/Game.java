@@ -25,6 +25,7 @@ import java.util.LinkedList;
  */
 public class Game implements Runnable {
 
+    
     /**
      * start main game thread
      */
@@ -84,7 +85,9 @@ public class Game implements Runnable {
     
     private int score;
     private int combo;
+    private int maxCombo;
 
+    private boolean gameStart;
     /**
      * to create title, width and heigh t and set the game is still not running
      * 
@@ -106,6 +109,8 @@ public class Game implements Runnable {
         score = 0;
         combo = 0;
         gameDone = false;
+        maxCombo = 0;
+        gameStart = false;
     }
 
     /**
@@ -175,130 +180,150 @@ public class Game implements Runnable {
         }
         
         keyManager.tick();
-        player.tick();
-        ball.tick();
         
-        if (starting) {
-            if (keyManager.space) {
-                starting = false;
+        if(!gameStart){
+            if(keyManager.enter){
+                gameStart = true;
             }
         }
+        if(gameStart){
+            player.tick();
+            ball.tick();
 
-        if (ball.intersects(player) && !starting) {
-            combo = 0;
-            
-            //Check if ball hits from up
-            if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
-                
-                //Calculate the distance the ball is from the center of the player pad
-                float dist = ball.getX() + ball.getWidth() / 2 - (player.getX() + player.getWidth() / 2);
-                
-                //Map the dist value in proportion to the maxVel of the ball
-                int deltaVel = (int) ((dist / 150.0) * ball.getMaxVel());
-                
-                //Update ball's xVel accordingly
-                ball.setxVel(ball.getxVel() + deltaVel);
-            }
-            
-            //Bounce the velocity in the y component
-            ball.setyVel(ball.getyVel() * -1);
-        }
-        
-        boolean bricksDone = true;
-        
-        //Tick for all bricks
-        for(int i=0; i<bricks.size(); i++){
-            Brick myBrick = bricks.get(i);
-            myBrick.tick();
-
-            bricksDone = bricksDone && myBrick.isBroken();
-
-            //Check if the ball collides with a brick
-            if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
-                combo++;
-
-                myBrick.setLives(myBrick.getLives()-1);
-                
-                if (myBrick.getLives() == 0) {
-                    //Indicate that the brick has recently been broken
-                    myBrick.setRecentBroken(true);
-                    //Set it to permanently broken
-                    myBrick.setBroken(true);
-                    score += 200*combo;
-                } else {
-                    score += 50*combo;
-                }
-                    
-                
-                //Decide if create a powerup, chance is 1/2
-                boolean createPower = ((int) (Math.random() * 2)) == 0;
-
-                if (createPower) {
-                    //Choose a random power
-                    int power = (int) (Math.random() * 2);
-                    powerups.add(new PowerUp(myBrick.getX(), myBrick.getY(), 60, 20, power));
-                }
-                
-                numBrokenBricks++;
-                brickBroke = true;
-                
-                //Padding is the error tolerance of the collision of the ball with the left and right side of the bricks
-                int padding = 5;
-
-                boolean brickBetween = ball.getY() > myBrick.getY() + padding && ball.getY() < myBrick.getY() + myBrick.getHeight() - padding;
-                boolean upBetween = ball.getY() + ball.getHeight() > myBrick.getY() + padding&&ball.getY() + ball.getHeight() < myBrick.getY()
-                        + myBrick.getHeight() - padding;
-                boolean downBetween = ball.getY() < myBrick.getY() && ball.getY() + ball.getHeight() > myBrick.getY() + myBrick.getHeight();
-
-                //Check if the collision is on the side of the brick
-                if(upBetween || downBetween || brickBetween) {
-                    //If so invert the x speed of the ball
-                    ball.setxVel(ball.getxVel() * -1);
-                }
-                else{
-                    //Else invert the y speed of the ball
-                    ball.setyVel(ball.getyVel() * -1);               
+            if (starting) {
+                if (keyManager.space) {
+                    starting = false;
                 }
             }
-        }
-        
-        //Tick for all powerups
-        for (int i = 0; i < powerups.size(); i++) {
-            PowerUp powerup = powerups.get(i);
-            
-            powerup.tick();
-            
-            if (powerup.intersects(player)) {
-                powerups.remove(i);
-                
-                //Check which power is activated
-                switch(powerup.power) {
-                    case speed:
-                        player.activateFastSpeed();
-                        break;
-                    
-                    case size:
-                        player.activateBigSize();
-                        break;
+
+            if (ball.intersects(player) && !starting) {
+                combo = 0;
+                int pad = 10;
+                boolean playerBetween = ball.getY() > player.getY() + pad && ball.getY() < player.getY() + player.getHeight() - pad;
+                boolean upBetweenPlayer = ball.getY() + ball.getHeight() > player.getY() + pad&&ball.getY() + ball.getHeight() < player.getY()
+                            + player.getHeight() - pad;
+                boolean downBetweenPlayer = ball.getY() < player.getY() && ball.getY() + ball.getHeight() > player.getY() + player.getHeight();
+                //Check if the ball hits from aside
+                if(playerBetween || upBetweenPlayer || downBetweenPlayer){
+                    ball.setxVel(ball.getxVel()*-1);
                 }
+                else{  //ball hits from up
+                    //Calculate the distance the ball is from the center of the player pad
+                    float dist = ball.getX() + ball.getWidth() / 2 - (player.getX() + player.getWidth() / 2);
+
+                    //Map the dist value in proportion to the maxVel of the ball
+                    int deltaVel = (int) ((dist / 150.0) * ball.getMaxVel());
+
+                    //Update ball's xVel accordingly
+                    ball.setxVel(ball.getxVel() + deltaVel);
+
+                    //Bounce the velocity in the y component
+                    ball.setyVel(ball.getyVel() * -1);
+                }
+                // if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
+                //}
+            }
+
+            boolean bricksDone = true;
+
+            //Tick for all bricks
+            for(int i=0; i<bricks.size(); i++){
+                Brick myBrick = bricks.get(i);
+                myBrick.tick();
+
+                bricksDone = bricksDone && myBrick.isBroken();
+
+                //Check if the ball collides with a brick
+                if(ball.intersects(myBrick) && !brickBroke && !myBrick.isBroken()){
+                    combo++;
+                    if(combo>maxCombo){
+                        maxCombo = combo;
+                    }
+
+                    myBrick.setLives(myBrick.getLives()-1);
+
+                    if (myBrick.getLives() == 0) {
+                        //Indicate that the brick has recently been broken
+                        myBrick.setRecentBroken(true);
+                        //Set it to permanently broken
+                        myBrick.setBroken(true);
+                        score += 200*combo;
+                    } else {
+                        score += 50*combo;
+                    }
+
+
+                    //Decide if create a powerup, chance is 1/2
+                    boolean createPower = ((int) (Math.random() * 2)) == 0;
+
+                    if (createPower) {
+                        //Choose a random power
+                        int power = (int) (Math.random() * 2);
+                        powerups.add(new PowerUp(myBrick.getX(), myBrick.getY(), 60, 20, power));
+                    }
+
+                    numBrokenBricks++;
+                    brickBroke = true;
+
+                    //Padding is the error tolerance of the collision of the ball with the left and right side of the bricks
+                    int padding = 5;
+
+                    boolean brickBetween = ball.getY() > myBrick.getY() + padding && ball.getY() < myBrick.getY() + myBrick.getHeight() - padding;
+                    boolean upBetween = ball.getY() + ball.getHeight() > myBrick.getY() + padding&&ball.getY() + ball.getHeight() < myBrick.getY()
+                            + myBrick.getHeight() - padding;
+                    boolean downBetween = ball.getY() < myBrick.getY() && ball.getY() + ball.getHeight() > myBrick.getY() + myBrick.getHeight();
+
+                    //Check if the collision is on the side of the brick
+                    if(upBetween || downBetween || brickBetween) {
+                        //If so invert the x speed of the ball
+                        ball.setxVel(ball.getxVel() * -1);
+                    }
+                    else{
+                        //Else invert the y speed of the ball
+                        ball.setyVel(ball.getyVel() * -1);               
+                    }
+                }
+            }
+
+            //Tick for all powerups
+            for (int i = 0; i < powerups.size(); i++) {
+                PowerUp powerup = powerups.get(i);
+
+                powerup.tick();
+
+                if (powerup.intersects(player)) {
+                    powerups.remove(i);
+
+                    //Check which power is activated
+                    switch(powerup.power) {
+                        case speed:
+                            player.activateFastSpeed();
+                            break;
+
+                        case size:
+                            player.activateBigSize();
+                            break;
+                    }
+                }
+            }
+
+            gameDone = bricksDone;
+
+            brickBroke = false;
+            if (ball.getY() + ball.getHeight() > getHeight()) {
+                player.setLives(player.getLives()-1);
+                resetPositions();
+            }
+
+            if (player.getLives() <= 0) {
+                gameOver = true;
+            }
+
+            if (keyManager.p) {
+                pause = !pause;
             }
         }
         
-        gameDone = bricksDone;
-        
-        brickBroke = false;
-        if (ball.getY() + ball.getHeight() > getHeight()) {
-            player.setLives(player.getLives()-1);
-            resetPositions();
-        }
-        
-        if (player.getLives() <= 0) {
-            gameOver = true;
-        }
-        
-        if (keyManager.p) {
-            pause = !pause;
-        }
     }    
 
     /**
@@ -311,52 +336,64 @@ public class Game implements Runnable {
         if (bs == null) {
             display.getCanvas().createBufferStrategy(3);
         } else {
-            g = bs.getDrawGraphics();
-            g.clearRect(0, 0, width, height);
-            g.drawImage(Assets.background, 0, 0, width, height, null);
-            player.render(g);
-            ball.render(g);
-            for (int i = 0; i < bricks.size(); i++) {
-                Brick myBrick = bricks.get(i);
-                myBrick.render(g);
+            if(!gameStart){
+                g = bs.getDrawGraphics();
+                g.clearRect(0, 0, width, height);
+                g.drawImage(Assets.startScreen, 0, 0, width, height, null);
             }
-            
-            for (int i = 0; i < powerups.size(); i++) {
-                PowerUp powerup = powerups.get(i);
-                powerup.render(g);
-            }
-            
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
-            g.setColor(Color.white);
-            g.drawString("Score: " + Integer.toString(score), 40, 50);
-            if(combo>1){
-                g.drawString("Combo: x" + Integer.toString(combo), 40, 80);
+            else{
+                g = bs.getDrawGraphics();
+                g.clearRect(0, 0, width, height);
+                g.drawImage(Assets.background, 0, 0, width, height, null);
+                player.render(g);
+                ball.render(g);
+                for (int i = 0; i < bricks.size(); i++) {
+                    Brick myBrick = bricks.get(i);
+                    myBrick.render(g);
+                }
+
+                for (int i = 0; i < powerups.size(); i++) {
+                    PowerUp powerup = powerups.get(i);
+                    powerup.render(g);
+                }
+
+                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                g.setColor(Color.white);
+                g.drawString("Score: " + Integer.toString(score), 40, 50);
+                if(combo>1){
+                    g.drawString("Combo: x" + Integer.toString(combo), 40, 80);
+
+                }
+
+                for (int i = 0; i < player.getLives(); i++) {
+                    g.drawImage(Assets.life, 250 + 40*i, 20, 40, 40, null);
+                }
+
+                if (gameOver) {
+                    g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+                    g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                }
+
+                if (pause) {
+                    g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+                    g.drawString("PAUSA", width/2 - 200, height/2 + 50);
+                }
+
+                if (gameDone) {
+                    g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+                    g.drawString("YOU WIN!", width/2 - 250, height/2 + 50);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Final Score: " + score, width/2 - 120, height/2 + 150);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
+                }
 
             }
             
-            for (int i = 0; i < player.getLives(); i++) {
-                g.drawImage(Assets.life, 250 + 40*i, 20, 40, 40, null);
-            }
-            
-            if (gameOver) {
-                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
-                g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
-                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
-                g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
-            }
-            
-            if (pause) {
-                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
-                g.drawString("PAUSA", width/2 - 200, height/2 + 50);
-            }
-            
-            if (gameDone) {
-                g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
-                g.drawString("YOU WIN!", width/2 - 250, height/2 + 50);
-                g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
-                g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
-            }
-
             bs.show();
             g.dispose();
         }

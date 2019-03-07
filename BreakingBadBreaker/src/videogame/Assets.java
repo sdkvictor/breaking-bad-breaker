@@ -27,6 +27,8 @@ public class Assets {
     public static BufferedImage animationBall[];
     public static BufferedImage animationExplosion[];
     
+    public static BufferedImage startScreen;
+    
     public static void init() {
         background = ImageLoader.loadImage("/images/back_break.jpg");
         life = ImageLoader.loadImage("/images/heart.png");
@@ -60,6 +62,7 @@ public class Assets {
         animationBall[10] = sheetBall.crop(29, 231, 50, 50);
         animationBall[9] = sheetBall.crop(135, 232, 48, 48);
         
+        startScreen = ImageLoader.loadImage("/images/startScreen.png");
         int count = 0;
         
         for (int i = 0; i < 4; i++) {

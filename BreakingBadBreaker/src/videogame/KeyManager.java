@@ -22,6 +22,7 @@ public class KeyManager implements KeyListener {
     public boolean g;
     public boolean c;
     public boolean space;
+    public boolean enter;
     
     private boolean keys[];
     
@@ -53,6 +54,7 @@ public class KeyManager implements KeyListener {
         right = keys[KeyEvent.VK_RIGHT];
         
         space = keys[KeyEvent.VK_SPACE];
+        enter = keys[KeyEvent.VK_ENTER];
         
         r = keys[KeyEvent.VK_R];
         g = keys[KeyEvent.VK_G];
