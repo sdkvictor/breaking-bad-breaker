@@ -82,11 +82,13 @@ public class Game implements Runnable {
     
     private boolean starting;
     
-    private int score;
-    private int combo;
-    private int maxCombo;
+    private int score; //puntuación actual
+    private int combo; //combo actual
+    private int maxCombo; //combo maximo alcanzado
 
-    private boolean gameStart;
+    private boolean gameStart; //el juego comienza
+    private boolean firstInstructions; //primera pantalla de instrucciones
+    private boolean pauseInstructions; //instrucciones desde el menú de pausa
     /**
      * to create title, width and heigh t and set the game is still not running
      * 
@@ -110,6 +112,8 @@ public class Game implements Runnable {
         gameDone = false;
         maxCombo = 0;
         gameStart = false;
+        firstInstructions = false;
+        pauseInstructions = false;
     }
 
     /**
@@ -166,7 +170,15 @@ public class Game implements Runnable {
                 saveGame();
             if (keyManager.c)
                 loadGame();
-            if (keyManager.p) {
+            if  (keyManager.i){
+                pauseInstructions = true;
+            }
+            if  (pauseInstructions){
+                if(keyManager.x){
+                    pauseInstructions = false;
+                }
+            }
+            if (keyManager.p && !pauseInstructions) {
                 pause = !pause;
             }
             return;
@@ -188,7 +200,13 @@ public class Game implements Runnable {
                 gameStart = true;
             }
         }
-        if(gameStart){
+        if(!firstInstructions){
+            if(keyManager.x){
+                firstInstructions = true;
+            }
+        }
+        
+        if(gameStart&&firstInstructions){
             player.tick();
             ball.tick();
 
@@ -201,14 +219,25 @@ public class Game implements Runnable {
             if (ball.intersects(player) && !starting) {
                 combo = 0;
                 int pad = 10;
+
                 boolean playerBetween = ball.getY() > player.getY() + pad && ball.getY() < player.getY() + player.getHeight() - pad;
                 boolean upBetweenPlayer = ball.getY() + ball.getHeight() > player.getY() + pad&&ball.getY() + ball.getHeight() < player.getY()
                             + player.getHeight() - pad;
                 boolean downBetweenPlayer = ball.getY() < player.getY() && ball.getY() + ball.getHeight() > player.getY() + player.getHeight();
                 //Check if the ball hits from aside
                 if(playerBetween || upBetweenPlayer || downBetweenPlayer){
-                    ball.setxVel(ball.getxVel()*-1);
+                    if(ball.getX()>player.getX()+player.getWidth()-10){
+                        //the ball hits the player from the right
+                        //make x vel positive
+                        ball.setxVel(Math.abs(ball.getxVel()));
+                    }
+                    else{ //the ball hits the player from the left
+                        //make x vel negative
+                        ball.setxVel(Math.abs(ball.getxVel())*-1);
+                    }
                 }
+                
+                //if(ball.getLastPos()>player.getY()-pad)
                 else{  //ball hits from up
                     //Calculate the distance the ball is from the center of the player pad
                     float dist = ball.getX() + ball.getWidth() / 2 - (player.getX() + player.getWidth() / 2);
@@ -220,7 +249,7 @@ public class Game implements Runnable {
                     ball.setxVel(ball.getxVel() + deltaVel);
 
                     //Bounce the velocity in the y component
-                    ball.setyVel(ball.getyVel() * -1);
+                    ball.setyVel(Math.abs(ball.getyVel())*(-1));
                 }
                 // if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
                 //}
@@ -344,6 +373,11 @@ public class Game implements Runnable {
                 g.clearRect(0, 0, width, height);
                 g.drawImage(Assets.startScreen, 0, 0, width, height, null);
             }
+            else if(!firstInstructions){
+                g = bs.getDrawGraphics();
+                g.clearRect(0, 0, width, height);
+                g.drawImage(Assets.instructions, 0, 0, width, height, null);
+            }
             else{
                 g = bs.getDrawGraphics();
                 g.clearRect(0, 0, width, height);
@@ -371,15 +405,24 @@ public class Game implements Runnable {
                 for (int i = 0; i < player.getLives(); i++) {
                     g.drawImage(Assets.life, 250 + 40*i, 20, 40, 40, null);
                 }
+                
+                if(pauseInstructions){
+                    g.clearRect(0, 0, width, height);
+                    g.drawImage(Assets.instructions, 0, 0, width, height, null);
+                }
 
                 if (gameOver) {
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Final Score: " + score, width/2 - 120, height/2 + 150);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
                 }
 
-                if (pause) {
+                if (pause&&!pauseInstructions) {
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("PAUSA", width/2 - 200, height/2 + 50);
                 }
