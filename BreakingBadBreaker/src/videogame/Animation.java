@@ -21,6 +21,11 @@ public class Animation {
     
     private BufferedImage[] frames;
     
+    /**
+     * To create a new animation object
+     * @param frames
+     * @param speed 
+     */
     public Animation(BufferedImage[] frames, int speed) {
         this.frames = frames;
         this.speed = speed;
@@ -31,10 +36,17 @@ public class Animation {
         done = false;
     }
     
+    /**
+     * To get the current frame of the animation
+     * @return 
+     */
     public BufferedImage getCurrentFrame() {
         return frames[index];
     }
     
+    /**
+     * to update the animation every frame
+     */
     public void tick() {
         timer += System.currentTimeMillis() - lastTime;
         lastTime = System.currentTimeMillis();
@@ -49,11 +61,19 @@ public class Animation {
             }
         }
     }
-
+    
+    /**
+     * to set done
+     * @param done 
+     */
     public void setDone(boolean done) {
         this.done = done;
     }
-
+    
+    /**
+     * To get done
+     * @return 
+     */
     public boolean isDone() {
         return done;
     }

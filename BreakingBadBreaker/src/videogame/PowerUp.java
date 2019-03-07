@@ -20,7 +20,15 @@ public class PowerUp extends Item {
     public static enum Power {speed, size};
     
     Power power;
-
+    
+    /**
+     * Create new powerup
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param power 
+     */
     public PowerUp(int x, int y, int width, int height, int power) {
         super(x, y, width, height);
         speed = 5;
@@ -36,12 +44,19 @@ public class PowerUp extends Item {
                 break;
         }
     }
-
+    
+    /**
+     * Update object every frame
+     */
     @Override
     public void tick() {
         setY(getY() + speed);
     }
-
+    
+    /**
+     * Render object in the canvas
+     * @param g 
+     */
     @Override
     public void render(Graphics g) {
         g.drawImage(image, getX(), getY(), getWidth(), getHeight(), null);
