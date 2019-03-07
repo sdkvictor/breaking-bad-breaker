@@ -26,7 +26,15 @@ public class Player extends Item {
     private int sizeCounter;
     private boolean isSpeedPower;
     private boolean isSizePower;
-
+    
+    /**
+     * To create a new player object
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param game 
+     */
     public Player(int x, int y, int width, int height, Game game) {
         super(x, y, width, height);
         this.game = game;
@@ -42,7 +50,10 @@ public class Player extends Item {
         
         origSize = width;
     }
-
+    
+    /**
+     * updates the object every frame
+     */
     @Override
     public void tick() {
         
@@ -62,9 +73,15 @@ public class Player extends Item {
             setX(0);
         }
         
+        //Check if fast speed powerup is active
         if (isSpeedPower) {
+            
+            //Increase counter every frame
             speedCounter++;
             
+            //If counter reaches 200, at 50 fps it means that 4 seconds have passed
+            //which will be the limit of time the powerup if active
+            //so deactivate the powerup
             if (speedCounter == 200) {
                 speed = origSpeed;
                 speedCounter = 0;
@@ -72,6 +89,8 @@ public class Player extends Item {
             }
         }
         
+        
+        //Same logic as speedPower is applied to isSizePower
         if (isSizePower) {
             sizeCounter++;
             
@@ -82,7 +101,11 @@ public class Player extends Item {
             }
         }
     }
-
+    
+    /**
+     * Paints the object to the canvas
+     * @param g 
+     */
     @Override
     public void render(Graphics g) {
         g.setColor(Color.white);
@@ -97,62 +120,116 @@ public class Player extends Item {
         }
     }
     
+    /**
+     * Activate the special powerup for faster speed
+     */
     public void activateFastSpeed() {
         isSpeedPower = true;
         speedCounter = 0;
         speed = origSpeed *3;
     }
     
+    /**
+     * Activate the special powerup for bigger pad size
+     */
     public void activateBigSize() {
         isSizePower = true;
         sizeCounter = 0;
         width = origSize *2;
     }
-
+    
+    /**
+     * To get the player lives
+     * @return 
+     */
     public int getLives() {
         return lives;
     }
-
+    
+    /**
+     * To set the player lives
+     * @param lives 
+     */
     public void setLives(int lives) {
         this.lives = lives;
     }
-
+    
+    /**
+     * to get the current speed
+     * @return 
+     */
     public int getSpeed() {
         return speed;
     }
-
+    
+    /**
+     * To set the current speed
+     * @param speed 
+     */
     public void setSpeed(int speed) {
         this.speed = speed;
     }
-
+    
+    /**
+     * To check if isSpeedPower is active
+     * @return 
+     */
     public boolean isIsSpeedPower() {
         return isSpeedPower;
     }
-
+    
+    /**
+     * To check if isSizePower is active
+     * @return 
+     */
     public boolean isIsSizePower() {
         return isSizePower;
     }
-
+    
+    /**
+     * To set isSizePower
+     * @param isSizePower 
+     */
     public void setIsSizePower(boolean isSizePower) {
         this.isSizePower = isSizePower;
     }
-
+    
+    /**
+     * To set isSpeedPower
+     * @param isSpeedPower 
+     */
     public void setIsSpeedPower(boolean isSpeedPower) {
         this.isSpeedPower = isSpeedPower;
     }
-
+    
+    /**
+     * To get speedCounter
+     * @return 
+     */
     public int getSpeedCounter() {
         return speedCounter;
     }
-
+    
+    /**
+     * to get sizeCounter
+     * @return 
+     */
     public int getSizeCounter() {
         return sizeCounter;
     }
-
+    
+    /**
+     * to set speedCounter
+     * @param speedCounter 
+     */
     public void setSpeedCounter(int speedCounter) {
         this.speedCounter = speedCounter;
     }
-
+    
+    /**
+     * to set sizeCounter
+     * @param sizeCounter 
+     */
     public void setSizeCounter(int sizeCounter) {
         this.sizeCounter = sizeCounter;
     }

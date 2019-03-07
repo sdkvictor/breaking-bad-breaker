@@ -472,6 +472,11 @@ public class Game implements Runnable {
         player.setX(getWidth() / 2 - player.getWidth() / 2);
     }
     
+    /**
+     * Saves current game status into a text file
+     * Each important variable to define the current status of the game is
+     * stored in the file in a specific order
+     */
     private void saveGame() {
         try {
             PrintWriter pw = new PrintWriter(new FileWriter("game.txt"));
@@ -505,6 +510,24 @@ public class Game implements Runnable {
                 pw.println(Integer.toString(myBrick.getLives()));
                 pw.println(Integer.toString(myBrick.isBroken() ? 0 : 1));
             }
+            
+            pw.println(Integer.toString(powerups.size()));
+            
+            for (int i = 0; i < powerups.size(); i++) {
+                PowerUp powerup = powerups.get(i);
+                pw.println(Integer.toString(powerup.getX()));
+                pw.println(Integer.toString(powerup.getY()));
+                
+                switch(powerup.power) {
+                    case speed:
+                        pw.println(Integer.toString(0));
+                        break;
+                    case size:
+                        pw.println(Integer.toString(1));
+                        break;
+                }
+            }
+            
             pw.println(Integer.toString(score));
             pw.close();
             System.out.println("SAVING...");
@@ -514,6 +537,12 @@ public class Game implements Runnable {
             System.out.println(e.toString());
         }
     }
+    
+    /**
+     * Load game from text file
+     * This method open the designated text file and reads its contents
+     * and assigns them to their designated variables
+     */
     
     private void loadGame() {
         try {
@@ -546,6 +575,17 @@ public class Game implements Runnable {
                 Brick myBrick = bricks.get(i);
                 myBrick.setLives(Integer.parseInt(br.readLine()));
                 myBrick.setBroken(Integer.parseInt(br.readLine()) == 0);
+            }
+            
+            powerups.clear();
+            
+            int size = Integer.parseInt(br.readLine());
+            
+            for (int i = 0; i < size; i++) {
+                int x = Integer.parseInt(br.readLine());
+                int y = Integer.parseInt(br.readLine());
+                int power = Integer.parseInt(br.readLine());
+                powerups.add(new PowerUp(x, y, 60, 20, power));
             }
             
             score = Integer.parseInt(br.readLine());
@@ -592,10 +632,19 @@ public class Game implements Runnable {
         return mouseManager;
     }
     
+    
+    /**
+     * to get starting
+     * @return 
+     */
     public boolean getStarting() {
         return starting;
     }
-
+    
+    /**
+     * To get player
+     * @return 
+     */
     public Player getPlayer() {
         return player;
     }

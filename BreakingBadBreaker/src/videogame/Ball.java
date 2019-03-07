@@ -24,7 +24,15 @@ public class Ball extends Item {
     private int maxVel;
     
     private Animation ballAni;
-
+    
+    /**
+     * To create a new ball object
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param game 
+     */
     public Ball(int x, int y, int width, int height, Game game) {
         super(x, y, width, height);
         this.game = game;
@@ -38,10 +46,15 @@ public class Ball extends Item {
         
         ballAni = new Animation(Assets.animationBall, 100);
     }
-
+    
+    /**
+     * To update the object in a frame
+     */
     @Override
     public void tick() {
         setLastPos(getY()+getHeight());
+        
+        //If game is just starting, attach ball to the position of the player
         if (game.getStarting()) {
             setX(game.getPlayer().getX() + game.getPlayer().getWidth() / 2 - getWidth() / 2);
             setY(game.getPlayer().getY() -  getHeight());
@@ -50,18 +63,22 @@ public class Ball extends Item {
         setX(getX() + xVel);
         setY(getY() + yVel);
         
+        //Check collision with ceil
         if (getY() <= 0) {
             setyVel(getyVel() * -1);
         }
         
+        //Check collision with left wall
         if (getX() <= 0) {
             setxVel(Math.abs(getxVel()));
         }
         
+        //Check collision with right wall
         if (getX() + getWidth() >= game.getWidth()) {
             setxVel(Math.abs(getxVel()) * -1);
         }
         
+        //Limit velocity with maxvel
         if (getxVel() > getMaxVel()) {
             setxVel(getMaxVel());
         }
@@ -80,38 +97,67 @@ public class Ball extends Item {
         
         ballAni.tick();
     }
-
+    
+    /**
+     * To render the object in the canvas
+     * @param g 
+     */
     @Override
     public void render(Graphics g) {
         g.drawImage(ballAni.getCurrentFrame(), getX(), getY(), getWidth(), getHeight(), null);
-        //g.setColor(Color.gray);
-        //g.fillOval(x, y, width, height);
     }
-
+    
+    /**
+     * To get xVel
+     * @return 
+     */
     public int getxVel() {
         return xVel;
     }
-
+    
+    /**
+     * To get yVel
+     * @return 
+     */
     public int getyVel() {
         return yVel;
     }
-
+    /**
+     * To set xVel
+     * @param xVel 
+     */
     public void setxVel(int xVel) {
         this.xVel = xVel;
     }
-
+    
+    /**
+     * To set yVel
+     * @param yVel 
+     */
     public void setyVel(int yVel) {
         this.yVel = yVel;
     }
-
+    
+    /**
+     * to getMaxVel;
+     * @return 
+     */
     public int getMaxVel() {
         return maxVel;
     }
     
+    /**
+     * to get lastPos;
+     * @return 
+     */
     public int getLastPos(){
         return lastPos;
     }
     
+    /**
+     * To set lastPos;
+     * @param lastPos 
+     */
     public void setLastPos(int lastPos){
         this.lastPos = lastPos;
     }
