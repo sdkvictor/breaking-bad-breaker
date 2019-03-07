@@ -32,6 +32,9 @@ public class Assets {
     public static SoundClip explosionSound;
     public static SoundClip backMusic;
     
+    /**
+     * Initialize all assets
+     */
     public static void init() {
         background = ImageLoader.loadImage("/images/back_break.jpg");
         life = ImageLoader.loadImage("/images/heart.png");
