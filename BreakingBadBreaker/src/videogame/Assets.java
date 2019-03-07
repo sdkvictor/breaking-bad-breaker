@@ -28,7 +28,7 @@ public class Assets {
     public static BufferedImage animationExplosion[];
     
     public static BufferedImage startScreen;
-    
+    public static BufferedImage instructions;
     public static SoundClip explosionSound;
     public static SoundClip backMusic;
     
@@ -69,6 +69,8 @@ public class Assets {
         animationBall[9] = sheetBall.crop(135, 232, 48, 48);
         
         startScreen = ImageLoader.loadImage("/images/startscreen.png");
+        instructions = ImageLoader.loadImage("/images/instrucciones.png");
+        
         int count = 0;
         
         for (int i = 0; i < 4; i++) {

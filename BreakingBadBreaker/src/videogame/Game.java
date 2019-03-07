@@ -82,11 +82,13 @@ public class Game implements Runnable {
     
     private boolean starting;
     
-    private int score;
-    private int combo;
-    private int maxCombo;
+    private int score; //puntuación actual
+    private int combo; //combo actual
+    private int maxCombo; //combo maximo alcanzado
 
-    private boolean gameStart;
+    private boolean gameStart; //el juego comienza
+    private boolean firstInstructions; //primera pantalla de instrucciones
+    private boolean pauseInstructions; //instrucciones desde el menú de pausa
     /**
      * to create title, width and heigh t and set the game is still not running
      * 
@@ -110,6 +112,8 @@ public class Game implements Runnable {
         gameDone = false;
         maxCombo = 0;
         gameStart = false;
+        firstInstructions = false;
+        pauseInstructions = false;
     }
 
     /**
@@ -166,7 +170,15 @@ public class Game implements Runnable {
                 saveGame();
             if (keyManager.c)
                 loadGame();
-            if (keyManager.p) {
+            if  (keyManager.i){
+                pauseInstructions = true;
+            }
+            if  (pauseInstructions){
+                if(keyManager.x){
+                    pauseInstructions = false;
+                }
+            }
+            if (keyManager.p && !pauseInstructions) {
                 pause = !pause;
             }
             return;
@@ -188,7 +200,13 @@ public class Game implements Runnable {
                 gameStart = true;
             }
         }
-        if(gameStart){
+        if(!firstInstructions){
+            if(keyManager.x){
+                firstInstructions = true;
+            }
+        }
+        
+        if(gameStart&&firstInstructions){
             player.tick();
             ball.tick();
 
@@ -202,7 +220,6 @@ public class Game implements Runnable {
                 combo = 0;
                 int pad = 10;
 
-                
                 boolean playerBetween = ball.getY() > player.getY() + pad && ball.getY() < player.getY() + player.getHeight() - pad;
                 boolean upBetweenPlayer = ball.getY() + ball.getHeight() > player.getY() + pad&&ball.getY() + ball.getHeight() < player.getY()
                             + player.getHeight() - pad;
@@ -356,6 +373,11 @@ public class Game implements Runnable {
                 g.clearRect(0, 0, width, height);
                 g.drawImage(Assets.startScreen, 0, 0, width, height, null);
             }
+            else if(!firstInstructions){
+                g = bs.getDrawGraphics();
+                g.clearRect(0, 0, width, height);
+                g.drawImage(Assets.instructions, 0, 0, width, height, null);
+            }
             else{
                 g = bs.getDrawGraphics();
                 g.clearRect(0, 0, width, height);
@@ -383,6 +405,11 @@ public class Game implements Runnable {
                 for (int i = 0; i < player.getLives(); i++) {
                     g.drawImage(Assets.life, 250 + 40*i, 20, 40, 40, null);
                 }
+                
+                if(pauseInstructions){
+                    g.clearRect(0, 0, width, height);
+                    g.drawImage(Assets.instructions, 0, 0, width, height, null);
+                }
 
                 if (gameOver) {
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
@@ -395,7 +422,7 @@ public class Game implements Runnable {
                     g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
                 }
 
-                if (pause) {
+                if (pause&&!pauseInstructions) {
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
                     g.drawString("PAUSA", width/2 - 200, height/2 + 50);
                 }
