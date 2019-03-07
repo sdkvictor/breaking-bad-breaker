@@ -7,6 +7,8 @@ package videogame;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -17,6 +19,7 @@ public class Ball extends Item {
     private Game game;
     private int xVel;
     private int yVel;
+    private int lastPos;
     
     private int maxVel;
     
@@ -31,12 +34,14 @@ public class Ball extends Item {
         xVel = 0;
         yVel = 5;
         
+        lastPos = 0;
+        
         ballAni = new Animation(Assets.animationBall, 100);
     }
 
     @Override
     public void tick() {
-        
+        setLastPos(getY()+getHeight());
         if (game.getStarting()) {
             setX(game.getPlayer().getX() + game.getPlayer().getWidth() / 2 - getWidth() / 2);
             setY(game.getPlayer().getY() -  getHeight());
@@ -102,5 +107,14 @@ public class Ball extends Item {
     public int getMaxVel() {
         return maxVel;
     }
+    
+    public int getLastPos(){
+        return lastPos;
+    }
+    
+    public void setLastPos(int lastPos){
+        this.lastPos = lastPos;
+    }
+    
     
 }

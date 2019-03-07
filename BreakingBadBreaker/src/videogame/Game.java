@@ -199,14 +199,26 @@ public class Game implements Runnable {
             if (ball.intersects(player) && !starting) {
                 combo = 0;
                 int pad = 10;
+
+                
                 boolean playerBetween = ball.getY() > player.getY() + pad && ball.getY() < player.getY() + player.getHeight() - pad;
                 boolean upBetweenPlayer = ball.getY() + ball.getHeight() > player.getY() + pad&&ball.getY() + ball.getHeight() < player.getY()
                             + player.getHeight() - pad;
                 boolean downBetweenPlayer = ball.getY() < player.getY() && ball.getY() + ball.getHeight() > player.getY() + player.getHeight();
                 //Check if the ball hits from aside
                 if(playerBetween || upBetweenPlayer || downBetweenPlayer){
-                    ball.setxVel(ball.getxVel()*-1);
+                    if(ball.getX()>player.getX()+player.getWidth()-10){
+                        //the ball hits the player from the right
+                        //make x vel positive
+                        ball.setxVel(Math.abs(ball.getxVel()));
+                    }
+                    else{ //the ball hits the player from the left
+                        //make x vel negative
+                        ball.setxVel(Math.abs(ball.getxVel())*-1);
+                    }
                 }
+                
+                //if(ball.getLastPos()>player.getY()-pad)
                 else{  //ball hits from up
                     //Calculate the distance the ball is from the center of the player pad
                     float dist = ball.getX() + ball.getWidth() / 2 - (player.getX() + player.getWidth() / 2);
@@ -218,7 +230,7 @@ public class Game implements Runnable {
                     ball.setxVel(ball.getxVel() + deltaVel);
 
                     //Bounce the velocity in the y component
-                    ball.setyVel(ball.getyVel() * -1);
+                    ball.setyVel(Math.abs(ball.getyVel())*(-1));
                 }
                 // if (ball.getY() + ball.getHeight() <= player.getY() + 10) { //TODO: Check this condition
                 //}
@@ -374,6 +386,10 @@ public class Game implements Runnable {
                     g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Final Score: " + score, width/2 - 120, height/2 + 150);
+                    g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
+                    g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
                 }
 
                 if (pause) {
