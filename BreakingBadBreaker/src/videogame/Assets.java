@@ -72,7 +72,7 @@ public class Assets {
         animationBall[9] = sheetBall.crop(135, 232, 48, 48);
         
         startScreen = ImageLoader.loadImage("/images/startscreen.png");
-        instructions = ImageLoader.loadImage("/images/instrucciones.png");
+        instructions = ImageLoader.loadImage("/images/instructions.png");
         
         int count = 0;
         

@@ -129,7 +129,7 @@ public class Game implements Runnable {
         int brickNum = 0;
         int row = 0;
         //24 total bricks
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < 1; i++) {
             //6 bricks per row
             if(brickNum >= 6){
                 brickNum = 0;
@@ -463,7 +463,7 @@ public class Game implements Runnable {
                     g.drawString("GAME OVER", width/2 - 350, height/2 + 50);
                     //show instructions to restart the game
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
-                    g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                    g.drawString("Press R to start a new game", width/2 - 300, height/2 + 100);
                     //show final score
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Final Score: " + score, width/2 - 120, height/2 + 150);
@@ -475,7 +475,7 @@ public class Game implements Runnable {
                 if (pause&&!pauseInstructions) {
                     //show the message "PAUSA"
                     g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
-                    g.drawString("PAUSA", width/2 - 200, height/2 + 50);
+                    g.drawString("PAUSE", width/2 - 200, height/2 + 50);
                 }
                 //if all bricks were destroyed
                 if (gameDone) {
@@ -484,13 +484,13 @@ public class Game implements Runnable {
                     g.drawString("YOU WIN!", width/2 - 250, height/2 + 50);
                     //show instructions to restart the game
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
-                    g.drawString("Presiona R para iniciar un nuevo juego", width/2 - 300, height/2 + 100);
+                    g.drawString("Press R to start a new game", width/2 - 200, height/2 + 100);
                     //show final score and multiply it by the remaining lives of the player
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
                     g.drawString("Final Score: " + score*player.getLives(), width/2 - 120, height/2 + 150);
                     //show the maximum combo reached
                     g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 30));
-                    g.drawString("Maximum Combo: " + maxCombo, width/2 - 152, height/2 + 200);
+                    g.drawString("Maximum Combo: " + maxCombo, width/2 - 150, height/2 + 200);
                 }
 
             }
